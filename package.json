@@ -1,5 +1,5 @@
 {
-  "name": "game-launcher",
+  "name": "Olympus Frontend",
   "version": "1.0.0",
   "description": "Modern PC Game Launcher",
   "main": "dist-electron/main.js",
@@ -37,8 +37,8 @@
     "wait-on": "^7.2.0"
   },
   "build": {
-    "appId": "com.gamelauncher.app",
-    "productName": "Game Launcher",
+    "appId": "com.olympusfrontend.app",
+    "productName": "Olympus Frontend",
     "directories": {
       "output": "release"
     },
