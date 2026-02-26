@@ -1,0 +1,245 @@
+import { useState, useEffect } from 'react'
+import Sidebar from './components/Sidebar'
+import GameGrid from './components/GameGrid'
+import AddGameModal from './components/AddGameModal'
+import SettingsView from './components/SettingsView'
+import { GameInfo, ViewType, Settings } from './types'
+
+function App() {
+  const [games, setGames] = useState<GameInfo[]>([])
+  const [currentView, setCurrentView] = useState<ViewType>('all')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [settings, setSettings] = useState<Settings>({ theme: 'dark', scanOnStartup: true })
+  const [isScanning, setIsScanning] = useState(false)
+
+  useEffect(() => {
+    loadInitialData()
+  }, [])
+
+  const loadInitialData = async () => {
+    try {
+      const [loadedGames, loadedSettings] = await Promise.all([
+        window.electronAPI.getGames(),
+        window.electronAPI.getSettings()
+      ])
+      setGames(loadedGames)
+      setSettings(loadedSettings)
+
+      if (loadedSettings.scanOnStartup && loadedGames.length === 0) {
+        await scanForGames()
+      }
+    } catch (error) {
+      console.error('Error loading data:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const scanForGames = async () => {
+    setIsScanning(true)
+    try {
+      const result = await window.electronAPI.scanGames()
+      setGames(result.games)
+    } catch (error) {
+      console.error('Error scanning games:', error)
+    } finally {
+      setIsScanning(false)
+    }
+  }
+
+  const handleAddGame = async (gameData: Omit<GameInfo, 'id'>) => {
+    try {
+      const newGame = await window.electronAPI.addGame(gameData)
+      setGames(prev => [...prev, newGame])
+      setShowAddModal(false)
+    } catch (error) {
+      console.error('Error adding game:', error)
+    }
+  }
+
+  const handleRemoveGame = async (gameId: string) => {
+    try {
+      await window.electronAPI.removeGame(gameId)
+      setGames(prev => prev.filter(g => g.id !== gameId))
+    } catch (error) {
+      console.error('Error removing game:', error)
+    }
+  }
+
+  const handleLaunchGame = async (game: GameInfo) => {
+    try {
+      await window.electronAPI.launchGame(game)
+      setGames(prev => prev.map(g => {
+        if (g.id === game.id) {
+          return {
+            ...g,
+            lastPlayed: new Date().toISOString(),
+            playCount: (g.playCount || 0) + 1
+          }
+        }
+        return g
+      }))
+    } catch (error) {
+      console.error('Error launching game:', error)
+    }
+  }
+
+  const handleToggleFavorite = async (gameId: string) => {
+    const updatedGames = games.map(g => {
+      if (g.id === gameId) {
+        return { ...g, isFavorite: !g.isFavorite }
+      }
+      return g
+    })
+    setGames(updatedGames)
+    await window.electronAPI.saveGames(updatedGames)
+  }
+
+  const handleSaveSettings = async (newSettings: Settings) => {
+    try {
+      await window.electronAPI.saveSettings(newSettings)
+      setSettings(newSettings)
+    } catch (error) {
+      console.error('Error saving settings:', error)
+    }
+  }
+
+  const getFilteredGames = (): GameInfo[] => {
+    let filtered = games
+
+    if (currentView === 'favorites') {
+      filtered = games.filter(g => g.isFavorite)
+    } else if (currentView === 'recent') {
+      filtered = games
+        .filter(g => g.lastPlayed)
+        .sort((a, b) => {
+          const dateA = new Date(a.lastPlayed || 0).getTime()
+          const dateB = new Date(b.lastPlayed || 0).getTime()
+          return dateB - dateA
+        })
+        .slice(0, 10)
+    } else if (currentView !== 'all' && currentView !== 'settings') {
+      filtered = games.filter(g => g.store === currentView)
+    }
+
+    if (searchQuery) {
+      filtered = filtered.filter(g => 
+        g.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    }
+
+    return filtered
+  }
+
+  const filteredGames = getFilteredGames()
+
+  if (isLoading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-dark-bg">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-dark-textSecondary">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="h-screen w-screen flex bg-dark-bg">
+      <Sidebar 
+        currentView={currentView}
+        onViewChange={setCurrentView}
+        gameCounts={{
+          all: games.length,
+          favorites: games.filter(g => g.isFavorite).length,
+          recent: games.filter(g => g.lastPlayed).length,
+          steam: games.filter(g => g.store === 'steam').length,
+          epic: games.filter(g => g.store === 'epic').length,
+          ea: games.filter(g => g.store === 'ea').length,
+          custom: games.filter(g => g.store === 'custom').length
+        }}
+      />
+      
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {currentView === 'settings' ? (
+          <SettingsView 
+            settings={settings}
+            onSave={handleSaveSettings}
+            onScanGames={scanForGames}
+            isScanning={isScanning}
+          />
+        ) : (
+          <>
+            <header className="flex items-center justify-between px-6 py-4 border-b border-dark-border">
+              <div>
+                <h1 className="text-2xl font-semibold text-dark-text">
+                  {currentView === 'all' && 'All Games'}
+                  {currentView === 'favorites' && 'Favorites'}
+                  {currentView === 'recent' && 'Recently Played'}
+                  {currentView === 'steam' && 'Steam Games'}
+                  {currentView === 'epic' && 'Epic Games'}
+                  {currentView === 'ea' && 'EA Games'}
+                  {currentView === 'custom' && 'Custom Games'}
+                </h1>
+                <p className="text-sm text-dark-textSecondary mt-1">
+                  {filteredGames.length} {filteredGames.length === 1 ? 'game' : 'games'}
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search games..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-64 px-4 py-2 pl-10 bg-dark-surface border border-dark-border rounded-lg text-dark-text placeholder-dark-textSecondary focus:outline-none"
+                  />
+                  <svg 
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-textSecondary"
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                
+                <button
+                  onClick={() => setShowAddModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Game
+                </button>
+              </div>
+            </header>
+
+            <GameGrid
+              games={filteredGames}
+              onLaunch={handleLaunchGame}
+              onRemove={handleRemoveGame}
+              onToggleFavorite={handleToggleFavorite}
+              isEmpty={filteredGames.length === 0}
+              isScanning={isScanning}
+              onScan={scanForGames}
+            />
+          </>
+        )}
+      </main>
+
+      {showAddModal && (
+        <AddGameModal
+          onClose={() => setShowAddModal(false)}
+          onAdd={handleAddGame}
+        />
+      )}
+    </div>
+  )
+}
+
+export default App
