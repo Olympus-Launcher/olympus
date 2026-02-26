@@ -257,7 +257,7 @@ function createWindow() {
       contextIsolation: true,
       sandbox: false
     },
-    frame: true,
+    frame: false,
     show: false
   });
   mainWindow.once("ready-to-show", () => {
@@ -395,5 +395,21 @@ electron.ipcMain.handle("get-settings", async () => {
 electron.ipcMain.handle("save-settings", async (_, settings) => {
   store.set("settings", settings);
   return true;
+});
+electron.ipcMain.handle("window-minimize", () => {
+  mainWindow == null ? void 0 : mainWindow.minimize();
+});
+electron.ipcMain.handle("window-maximize", () => {
+  if (mainWindow == null ? void 0 : mainWindow.isMaximized()) {
+    mainWindow.unmaximize();
+  } else {
+    mainWindow == null ? void 0 : mainWindow.maximize();
+  }
+});
+electron.ipcMain.handle("window-close", () => {
+  mainWindow == null ? void 0 : mainWindow.close();
+});
+electron.ipcMain.handle("window-is-maximized", () => {
+  return (mainWindow == null ? void 0 : mainWindow.isMaximized()) ?? false;
 });
 log.info("Main process initialized");

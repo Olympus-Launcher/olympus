@@ -1,9 +1,11 @@
+import { StoreType } from '../config'
+
 export interface GameInfo {
   id: string
   name: string
   executablePath: string
   coverImage?: string
-  store: 'steam' | 'epic' | 'ea' | 'custom'
+  store: StoreType
   installLocation?: string
   lastPlayed?: string
   playCount?: number

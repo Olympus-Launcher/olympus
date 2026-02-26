@@ -10,6 +10,10 @@ const electronAPI = {
   selectExecutable: () => electron.ipcRenderer.invoke("select-executable"),
   selectImage: () => electron.ipcRenderer.invoke("select-image"),
   getSettings: () => electron.ipcRenderer.invoke("get-settings"),
-  saveSettings: (settings) => electron.ipcRenderer.invoke("save-settings", settings)
+  saveSettings: (settings) => electron.ipcRenderer.invoke("save-settings", settings),
+  windowMinimize: () => electron.ipcRenderer.invoke("window-minimize"),
+  windowMaximize: () => electron.ipcRenderer.invoke("window-maximize"),
+  windowClose: () => electron.ipcRenderer.invoke("window-close"),
+  windowIsMaximized: () => electron.ipcRenderer.invoke("window-is-maximized")
 };
 electron.contextBridge.exposeInMainWorld("electronAPI", electronAPI);

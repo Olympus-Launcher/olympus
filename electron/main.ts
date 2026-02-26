@@ -38,7 +38,7 @@ function createWindow() {
       contextIsolation: true,
       sandbox: false
     },
-    frame: true,
+    frame: false,
     show: false
   })
 
@@ -202,6 +202,26 @@ ipcMain.handle('get-settings', async () => {
 ipcMain.handle('save-settings', async (_, settings: { theme: string; scanOnStartup: boolean }) => {
   store.set('settings', settings)
   return true
+})
+
+ipcMain.handle('window-minimize', () => {
+  mainWindow?.minimize()
+})
+
+ipcMain.handle('window-maximize', () => {
+  if (mainWindow?.isMaximized()) {
+    mainWindow.unmaximize()
+  } else {
+    mainWindow?.maximize()
+  }
+})
+
+ipcMain.handle('window-close', () => {
+  mainWindow?.close()
+})
+
+ipcMain.handle('window-is-maximized', () => {
+  return mainWindow?.isMaximized() ?? false
 })
 
 log.info('Main process initialized')

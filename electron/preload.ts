@@ -32,7 +32,11 @@ const electronAPI = {
   selectExecutable: (): Promise<string | null> => ipcRenderer.invoke('select-executable'),
   selectImage: (): Promise<string | null> => ipcRenderer.invoke('select-image'),
   getSettings: (): Promise<Settings> => ipcRenderer.invoke('get-settings'),
-  saveSettings: (settings: Settings): Promise<boolean> => ipcRenderer.invoke('save-settings', settings)
+  saveSettings: (settings: Settings): Promise<boolean> => ipcRenderer.invoke('save-settings', settings),
+  windowMinimize: (): Promise<void> => ipcRenderer.invoke('window-minimize'),
+  windowMaximize: (): Promise<void> => ipcRenderer.invoke('window-maximize'),
+  windowClose: (): Promise<void> => ipcRenderer.invoke('window-close'),
+  windowIsMaximized: (): Promise<boolean> => ipcRenderer.invoke('window-is-maximized')
 }
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI)

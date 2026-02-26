@@ -8,7 +8,7 @@
     "build": "tsc && vite build && electron-builder",
     "build:vite": "tsc && vite build",
     "preview": "vite preview",
-    "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:dev": "concurrently \"vite --no-open\" \"wait-on http://localhost:5173 && electron .\"",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

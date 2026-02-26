@@ -3,7 +3,10 @@ import Sidebar from './components/Sidebar'
 import GameGrid from './components/GameGrid'
 import AddGameModal from './components/AddGameModal'
 import SettingsView from './components/SettingsView'
+import TitleBar from './components/TitleBar'
 import { GameInfo, ViewType, Settings } from './types'
+import { project, labels } from './config'
+import { theme } from './config'
 
 function App() {
   const [games, setGames] = useState<GameInfo[]>([])
@@ -137,18 +140,20 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center bg-dark-bg">
+      <div className={`h-screen w-screen flex items-center justify-center ${theme.colors.dark.bg === '#0f0f0f' ? 'bg-[#0f0f0f]' : 'bg-dark-bg'}`}>
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-dark-textSecondary">Loading...</p>
+          <div className="w-16 h-16 border-4 border-[#0284c7] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-dark-textSecondary">{labels.app.loading}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="h-screen w-screen flex bg-dark-bg">
-      <Sidebar 
+    <div className="h-screen w-screen flex flex-col bg-dark-bg">
+      <TitleBar />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar 
         currentView={currentView}
         onViewChange={setCurrentView}
         gameCounts={{
@@ -175,16 +180,16 @@ function App() {
             <header className="flex items-center justify-between px-6 py-4 border-b border-dark-border">
               <div>
                 <h1 className="text-2xl font-semibold text-dark-text">
-                  {currentView === 'all' && 'All Games'}
-                  {currentView === 'favorites' && 'Favorites'}
-                  {currentView === 'recent' && 'Recently Played'}
-                  {currentView === 'steam' && 'Steam Games'}
-                  {currentView === 'epic' && 'Epic Games'}
-                  {currentView === 'ea' && 'EA Games'}
-                  {currentView === 'custom' && 'Custom Games'}
+                  {currentView === 'all' && labels.sidebar.allGames}
+                  {currentView === 'favorites' && labels.sidebar.favorites}
+                  {currentView === 'recent' && labels.sidebar.recentlyPlayed}
+                  {currentView === 'steam' && project.supportedStoreNames.steam + ' Games'}
+                  {currentView === 'epic' && project.supportedStoreNames.epic + ' Games'}
+                  {currentView === 'ea' && project.supportedStoreNames.ea + ' Games'}
+                  {currentView === 'custom' && project.supportedStoreNames.custom + ' Games'}
                 </h1>
                 <p className="text-sm text-dark-textSecondary mt-1">
-                  {filteredGames.length} {filteredGames.length === 1 ? 'game' : 'games'}
+                  {filteredGames.length} {filteredGames.length === 1 ? labels.header.game : labels.header.games}
                 </p>
               </div>
               
@@ -192,7 +197,7 @@ function App() {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Search games..."
+                    placeholder={labels.search.placeholder}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-64 px-4 py-2 pl-10 bg-dark-surface border border-dark-border rounded-lg text-dark-text placeholder-dark-textSecondary focus:outline-none"
@@ -214,7 +219,7 @@ function App() {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                  Add Game
+                  {labels.addGame.title}
                 </button>
               </div>
             </header>
@@ -231,6 +236,7 @@ function App() {
           </>
         )}
       </main>
+      </div>
 
       {showAddModal && (
         <AddGameModal

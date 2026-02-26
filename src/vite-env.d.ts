@@ -12,5 +12,9 @@ interface Window {
     selectImage: () => Promise<string | null>
     getSettings: () => Promise<import('./types').Settings>
     saveSettings: (settings: import('./types').Settings) => Promise<boolean>
+    windowMinimize: () => Promise<void>
+    windowMaximize: () => Promise<void>
+    windowClose: () => Promise<void>
+    windowIsMaximized: () => Promise<boolean>
   }
 }

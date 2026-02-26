@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { GameInfo } from '../types'
+import { project, labels } from '../config'
 
 interface AddGameModalProps {
   onClose: () => void
@@ -10,7 +11,7 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
   const [name, setName] = useState('')
   const [executablePath, setExecutablePath] = useState('')
   const [coverImage, setCoverImage] = useState('')
-  const [store, setStore] = useState<'steam' | 'epic' | 'ea' | 'custom'>('custom')
+  const [store, setStore] = useState<typeof project.supportedStores[number]>('custom')
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSelectExecutable = async () => {
@@ -52,7 +53,7 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
     <div className="fixed inset-0 bg-black/70 modal-overlay flex items-center justify-center z-50">
       <div className="bg-dark-surface border border-dark-border rounded-2xl w-full max-w-md mx-4 overflow-hidden fade-in">
         <div className="flex items-center justify-between px-6 py-4 border-b border-dark-border">
-          <h2 className="text-lg font-semibold text-dark-text">Add Game</h2>
+          <h2 className="text-lg font-semibold text-dark-text">{labels.addGame.title}</h2>
           <button
             onClick={onClose}
             className="p-1 text-dark-textSecondary hover:text-dark-text transition-colors"
@@ -66,13 +67,13 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-dark-textSecondary mb-2">
-              Game Name *
+              {labels.addGame.gameName} *
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter game name"
+              placeholder={labels.addGame.gameNamePlaceholder}
               className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg text-dark-text placeholder-dark-textSecondary"
               required
             />
@@ -80,14 +81,14 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
 
           <div>
             <label className="block text-sm font-medium text-dark-textSecondary mb-2">
-              Executable Path *
+              {labels.addGame.executablePath} *
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={executablePath}
                 onChange={(e) => setExecutablePath(e.target.value)}
-                placeholder="C:\Games\game.exe"
+                placeholder={labels.addGame.executablePathPlaceholder}
                 className="flex-1 px-4 py-2 bg-dark-bg border border-dark-border rounded-lg text-dark-text placeholder-dark-textSecondary"
                 required
               />
@@ -96,21 +97,21 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
                 onClick={handleSelectExecutable}
                 className="px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-dark-text hover:bg-dark-border transition-colors"
               >
-                Browse
+                {labels.addGame.browse}
               </button>
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-dark-textSecondary mb-2">
-              Cover Image (optional)
+              {labels.addGame.coverImage}
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={coverImage}
                 onChange={(e) => setCoverImage(e.target.value)}
-                placeholder="C:\Images\cover.jpg"
+                placeholder={labels.addGame.coverImagePlaceholder}
                 className="flex-1 px-4 py-2 bg-dark-bg border border-dark-border rounded-lg text-dark-text placeholder-dark-textSecondary"
               />
               <button
@@ -118,7 +119,7 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
                 onClick={handleSelectImage}
                 className="px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-dark-text hover:bg-dark-border transition-colors"
               >
-                Browse
+                {labels.addGame.browse}
               </button>
             </div>
           </div>
@@ -135,10 +136,10 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
 
           <div>
             <label className="block text-sm font-medium text-dark-textSecondary mb-2">
-              Store / Source
+              {labels.addGame.storeSource}
             </label>
             <div className="grid grid-cols-4 gap-2">
-              {(['steam', 'epic', 'ea', 'custom'] as const).map((s) => (
+              {project.supportedStores.map((s) => (
                 <button
                   key={s}
                   type="button"
@@ -149,7 +150,7 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
                       : 'bg-dark-card text-dark-textSecondary hover:bg-dark-border'
                   }`}
                 >
-                  {s.charAt(0).toUpperCase() + s.slice(1)}
+                  {project.supportedStoreNames[s]}
                 </button>
               ))}
             </div>
@@ -161,14 +162,14 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
               onClick={onClose}
               className="flex-1 py-2 bg-dark-card border border-dark-border rounded-lg text-dark-text hover:bg-dark-border transition-colors"
             >
-              Cancel
+              {labels.addGame.cancel}
             </button>
             <button
               type="submit"
               disabled={isLoading || !name || !executablePath}
               className="flex-1 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-600/50 text-white rounded-lg transition-colors"
             >
-              {isLoading ? 'Adding...' : 'Add Game'}
+              {isLoading ? labels.addGame.adding : labels.addGame.addGame}
             </button>
           </div>
         </form>
