@@ -20,13 +20,13 @@ module.exports = {
           800: '#075985',
           900: '#0c4a6e',
         },
-        dark: {
-          bg: '#0f0f0f',
-          surface: '#1a1a1a',
-          card: '#242424',
-          border: '#333333',
-          text: '#ffffff',
-          textSecondary: '#a0a0a0',
+        theme: {
+          bg: 'var(--color-bg)',
+          surface: 'var(--color-surface)',
+          card: 'var(--color-card)',
+          border: 'var(--color-border)',
+          text: 'var(--color-text)',
+          textSecondary: 'var(--color-text-secondary)',
         }
       },
       animation: {

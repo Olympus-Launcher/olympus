@@ -51,12 +51,12 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/70 modal-overlay flex items-center justify-center z-50">
-      <div className="bg-dark-surface border border-dark-border rounded-2xl w-full max-w-md mx-4 overflow-hidden fade-in">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-dark-border">
-          <h2 className="text-lg font-semibold text-dark-text">{labels.addGame.title}</h2>
+      <div className="bg-theme-surface border border-theme-border rounded-2xl w-full max-w-md mx-4 overflow-hidden fade-in">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-theme-border">
+          <h2 className="text-lg font-semibold text-theme-text">{labels.addGame.title}</h2>
           <button
             onClick={onClose}
-            className="p-1 text-dark-textSecondary hover:text-dark-text transition-colors"
+            className="p-1 text-theme-textSecondary hover:text-theme-text transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -66,7 +66,7 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-dark-textSecondary mb-2">
+            <label className="block text-sm font-medium text-theme-textSecondary mb-2">
               {labels.addGame.gameName} *
             </label>
             <input
@@ -74,13 +74,13 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={labels.addGame.gameNamePlaceholder}
-              className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg text-dark-text placeholder-dark-textSecondary"
+              className="w-full px-4 py-2 bg-theme-bg border border-theme-border rounded-lg text-theme-text placeholder-theme-textSecondary"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-dark-textSecondary mb-2">
+            <label className="block text-sm font-medium text-theme-textSecondary mb-2">
               {labels.addGame.executablePath} *
             </label>
             <div className="flex gap-2">
@@ -89,13 +89,13 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
                 value={executablePath}
                 onChange={(e) => setExecutablePath(e.target.value)}
                 placeholder={labels.addGame.executablePathPlaceholder}
-                className="flex-1 px-4 py-2 bg-dark-bg border border-dark-border rounded-lg text-dark-text placeholder-dark-textSecondary"
+                className="flex-1 px-4 py-2 bg-theme-bg border border-theme-border rounded-lg text-theme-text placeholder-theme-textSecondary"
                 required
               />
               <button
                 type="button"
                 onClick={handleSelectExecutable}
-                className="px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-dark-text hover:bg-dark-border transition-colors"
+                className="px-4 py-2 bg-theme-card border border-theme-border rounded-lg text-theme-text hover:bg-theme-border transition-colors"
               >
                 {labels.addGame.browse}
               </button>
@@ -103,7 +103,7 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-dark-textSecondary mb-2">
+            <label className="block text-sm font-medium text-theme-textSecondary mb-2">
               {labels.addGame.coverImage}
             </label>
             <div className="flex gap-2">
@@ -112,12 +112,12 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
                 value={coverImage}
                 onChange={(e) => setCoverImage(e.target.value)}
                 placeholder={labels.addGame.coverImagePlaceholder}
-                className="flex-1 px-4 py-2 bg-dark-bg border border-dark-border rounded-lg text-dark-text placeholder-dark-textSecondary"
+                className="flex-1 px-4 py-2 bg-theme-bg border border-theme-border rounded-lg text-theme-text placeholder-theme-textSecondary"
               />
               <button
                 type="button"
                 onClick={handleSelectImage}
-                className="px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-dark-text hover:bg-dark-border transition-colors"
+                className="px-4 py-2 bg-theme-card border border-theme-border rounded-lg text-theme-text hover:bg-theme-border transition-colors"
               >
                 {labels.addGame.browse}
               </button>
@@ -135,7 +135,7 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-dark-textSecondary mb-2">
+            <label className="block text-sm font-medium text-theme-textSecondary mb-2">
               {labels.addGame.storeSource}
             </label>
             <div className="grid grid-cols-4 gap-2">
@@ -147,7 +147,7 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
                   className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
                     store === s
                       ? 'bg-primary-600 text-white'
-                      : 'bg-dark-card text-dark-textSecondary hover:bg-dark-border'
+                      : 'bg-theme-card text-theme-textSecondary hover:bg-theme-border'
                   }`}
                 >
                   {project.supportedStoreNames[s]}
@@ -160,7 +160,7 @@ export default function AddGameModal({ onClose, onAdd }: AddGameModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2 bg-dark-card border border-dark-border rounded-lg text-dark-text hover:bg-dark-border transition-colors"
+              className="flex-1 py-2 bg-theme-card border border-theme-border rounded-lg text-theme-text hover:bg-theme-border transition-colors"
             >
               {labels.addGame.cancel}
             </button>

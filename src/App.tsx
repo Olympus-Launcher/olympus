@@ -5,8 +5,7 @@ import AddGameModal from './components/AddGameModal'
 import SettingsView from './components/SettingsView'
 import TitleBar from './components/TitleBar'
 import { GameInfo, ViewType, Settings } from './types'
-import { project, labels } from './config'
-import { theme } from './config'
+import { project, labels, themes } from './config'
 
 function App() {
   const [games, setGames] = useState<GameInfo[]>([])
@@ -16,6 +15,8 @@ function App() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [settings, setSettings] = useState<Settings>({ theme: 'dark', scanOnStartup: true })
   const [isScanning, setIsScanning] = useState(false)
+
+  const themeColors = themes[settings.theme]
 
   useEffect(() => {
     loadInitialData()
@@ -140,102 +141,128 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className={`h-screen w-screen flex items-center justify-center ${theme.colors.dark.bg === '#0f0f0f' ? 'bg-[#0f0f0f]' : 'bg-dark-bg'}`}>
+      <div 
+        className="h-screen w-screen flex items-center justify-center"
+        style={{ backgroundColor: themeColors.bg }}
+      >
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#0284c7] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-dark-textSecondary">{labels.app.loading}</p>
+          <div className="w-16 h-16 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p style={{ color: themeColors.textSecondary }}>{labels.app.loading}</p>
         </div>
       </div>
     )
   }
 
+  const appStyle = {
+    '--color-bg': themeColors.bg,
+    '--color-surface': themeColors.surface,
+    '--color-card': themeColors.card,
+    '--color-border': themeColors.border,
+    '--color-text': themeColors.text,
+    '--color-text-secondary': themeColors.textSecondary,
+  } as React.CSSProperties
+
   return (
-    <div className="h-screen w-screen flex flex-col bg-dark-bg">
-      <TitleBar />
+    <div className="h-screen w-screen flex flex-col" style={appStyle}>
+      <TitleBar theme={settings.theme} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar 
-        currentView={currentView}
-        onViewChange={setCurrentView}
-        gameCounts={{
-          all: games.length,
-          favorites: games.filter(g => g.isFavorite).length,
-          recent: games.filter(g => g.lastPlayed).length,
-          steam: games.filter(g => g.store === 'steam').length,
-          epic: games.filter(g => g.store === 'epic').length,
-          ea: games.filter(g => g.store === 'ea').length,
-          custom: games.filter(g => g.store === 'custom').length
-        }}
-      />
-      
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {currentView === 'settings' ? (
-          <SettingsView 
-            settings={settings}
-            onSave={handleSaveSettings}
-            onScanGames={scanForGames}
-            isScanning={isScanning}
-          />
-        ) : (
-          <>
-            <header className="flex items-center justify-between px-6 py-4 border-b border-dark-border">
-              <div>
-                <h1 className="text-2xl font-semibold text-dark-text">
-                  {currentView === 'all' && labels.sidebar.allGames}
-                  {currentView === 'favorites' && labels.sidebar.favorites}
-                  {currentView === 'recent' && labels.sidebar.recentlyPlayed}
-                  {currentView === 'steam' && project.supportedStoreNames.steam + ' Games'}
-                  {currentView === 'epic' && project.supportedStoreNames.epic + ' Games'}
-                  {currentView === 'ea' && project.supportedStoreNames.ea + ' Games'}
-                  {currentView === 'custom' && project.supportedStoreNames.custom + ' Games'}
-                </h1>
-                <p className="text-sm text-dark-textSecondary mt-1">
-                  {filteredGames.length} {filteredGames.length === 1 ? labels.header.game : labels.header.games}
-                </p>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder={labels.search.placeholder}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-64 px-4 py-2 pl-10 bg-dark-surface border border-dark-border rounded-lg text-dark-text placeholder-dark-textSecondary focus:outline-none"
-                  />
-                  <svg 
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-textSecondary"
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
+          currentView={currentView}
+          onViewChange={setCurrentView}
+          gameCounts={{
+            all: games.length,
+            favorites: games.filter(g => g.isFavorite).length,
+            recent: games.filter(g => g.lastPlayed).length,
+            steam: games.filter(g => g.store === 'steam').length,
+            epic: games.filter(g => g.store === 'epic').length,
+            ea: games.filter(g => g.store === 'ea').length,
+            custom: games.filter(g => g.store === 'custom').length
+          }}
+          theme={settings.theme}
+        />
+        
+        <main 
+          className="flex-1 flex flex-col overflow-hidden"
+          style={{ backgroundColor: themeColors.bg }}
+        >
+          {currentView === 'settings' ? (
+            <SettingsView 
+              settings={settings}
+              onSave={handleSaveSettings}
+              onScanGames={scanForGames}
+              isScanning={isScanning}
+            />
+          ) : (
+            <>
+              <header 
+                className="flex items-center justify-between px-6 py-4 border-b"
+                style={{ borderColor: themeColors.border }}
+              >
+                <div>
+                  <h1 className="text-2xl font-semibold" style={{ color: themeColors.text }}>
+                    {currentView === 'all' && labels.sidebar.allGames}
+                    {currentView === 'favorites' && labels.sidebar.favorites}
+                    {currentView === 'recent' && labels.sidebar.recentlyPlayed}
+                    {currentView === 'steam' && project.supportedStoreNames.steam + ' Games'}
+                    {currentView === 'epic' && project.supportedStoreNames.epic + ' Games'}
+                    {currentView === 'ea' && project.supportedStoreNames.ea + ' Games'}
+                    {currentView === 'custom' && project.supportedStoreNames.custom + ' Games'}
+                  </h1>
+                  <p className="text-sm mt-1" style={{ color: themeColors.textSecondary }}>
+                    {filteredGames.length} {filteredGames.length === 1 ? labels.header.game : labels.header.games}
+                  </p>
                 </div>
                 
-                <button
-                  onClick={() => setShowAddModal(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  {labels.addGame.title}
-                </button>
-              </div>
-            </header>
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder={labels.search.placeholder}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-64 px-4 py-2 pl-10 rounded-lg focus:outline-none"
+                      style={{ 
+                        backgroundColor: themeColors.surface, 
+                        border: `1px solid ${themeColors.border}`,
+                        color: themeColors.text,
+                      }}
+                    />
+                    <svg 
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                      style={{ color: themeColors.textSecondary }}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  
+                  <button
+                    onClick={() => setShowAddModal(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    {labels.addGame.title}
+                  </button>
+                </div>
+              </header>
 
-            <GameGrid
-              games={filteredGames}
-              onLaunch={handleLaunchGame}
-              onRemove={handleRemoveGame}
-              onToggleFavorite={handleToggleFavorite}
-              isEmpty={filteredGames.length === 0}
-              isScanning={isScanning}
-              onScan={scanForGames}
-            />
-          </>
-        )}
-      </main>
+              <GameGrid
+                games={filteredGames}
+                onLaunch={handleLaunchGame}
+                onRemove={handleRemoveGame}
+                onToggleFavorite={handleToggleFavorite}
+                isEmpty={filteredGames.length === 0}
+                isScanning={isScanning}
+                onScan={scanForGames}
+                themeColors={themeColors}
+              />
+            </>
+          )}
+        </main>
       </div>
 
       {showAddModal && (

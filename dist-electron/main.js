@@ -1,10 +1,10 @@
 "use strict";
 const electron = require("electron");
 const path = require("path");
+const fs = require("fs");
 const log = require("electron-log");
 const Store = require("electron-store");
 require("child_process");
-const fs = require("fs");
 async function fileExists(filePath) {
   try {
     await fs.promises.access(filePath);
@@ -231,8 +231,13 @@ async function detectEAGames() {
 log.transports.file.level = "info";
 log.transports.console.level = "debug";
 log.info("Application starting...");
+const configDir = path.join(electron.app.getPath("userData"), "config");
+if (!fs.existsSync(configDir)) {
+  fs.mkdirSync(configDir, { recursive: true });
+}
 const store = new Store({
-  name: "game-launcher-data",
+  cwd: configDir,
+  name: "settings",
   defaults: {
     games: [],
     settings: {

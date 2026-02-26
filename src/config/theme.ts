@@ -1,3 +1,64 @@
+export type ThemeMode = 'light' | 'dark'
+
+export interface ThemeDefinition {
+  id: ThemeMode
+  name: string
+  colors: {
+    bg: string
+    surface: string
+    card: string
+    border: string
+    text: string
+    textSecondary: string
+  }
+}
+
+export const themesList: ThemeDefinition[] = [
+  {
+    id: 'light',
+    name: 'Light',
+    colors: {
+      bg: '#f5f5f5',
+      surface: '#ffffff',
+      card: '#ffffff',
+      border: '#e5e5e5',
+      text: '#1a1a1a',
+      textSecondary: '#6b7280'
+    }
+  },
+  {
+    id: 'dark',
+    name: 'Dark',
+    colors: {
+      bg: '#0f0f0f',
+      surface: '#1a1a1a',
+      card: '#242424',
+      border: '#333333',
+      text: '#ffffff',
+      textSecondary: '#a0a0a0'
+    }
+  }
+]
+
+export const themes: Record<ThemeMode, ThemeDefinition['colors']> = {
+  light: {
+    bg: '#f5f5f5',
+    surface: '#ffffff',
+    card: '#ffffff',
+    border: '#e5e5e5',
+    text: '#1a1a1a',
+    textSecondary: '#6b7280'
+  },
+  dark: {
+    bg: '#0f0f0f',
+    surface: '#1a1a1a',
+    card: '#242424',
+    border: '#333333',
+    text: '#ffffff',
+    textSecondary: '#a0a0a0'
+  }
+}
+
 export const theme = {
   colors: {
     primary: {
@@ -11,14 +72,6 @@ export const theme = {
       700: '#0369a1',
       800: '#075985',
       900: '#0c4a6e'
-    },
-    dark: {
-      bg: '#0f0f0f',
-      surface: '#1a1a1a',
-      card: '#242424',
-      border: '#333333',
-      text: '#ffffff',
-      textSecondary: '#a0a0a0'
     },
     store: {
       steam: '#1b2838',
@@ -80,6 +133,17 @@ export const theme = {
   }
 }
 
+export const getThemeColors = (mode: ThemeMode) => {
+  return {
+    bg: themes[mode].bg,
+    surface: themes[mode].surface,
+    card: themes[mode].card,
+    border: themes[mode].border,
+    text: themes[mode].text,
+    textSecondary: themes[mode].textSecondary
+  }
+}
+
 export const labels = {
   app: {
     loading: 'Loading...',
@@ -89,7 +153,8 @@ export const labels = {
     allGames: 'All Games',
     favorites: 'Favorites',
     recentlyPlayed: 'Recently Played',
-    settings: 'Settings'
+    settings: 'Settings',
+    yourGames: 'Your PC Games'
   },
   gameGrid: {
     noGamesFound: 'No Games Found',
@@ -135,8 +200,10 @@ export const labels = {
     manualScan: 'Manual Scan',
     manualScanDescription: 'Scan your computer for installed games from Steam, Epic Games, and EA.',
     appearance: 'Appearance',
-    darkMode: 'Dark Mode',
-    darkModeDescription: 'Use dark theme for the application',
+    theme: 'Theme',
+    themeDescription: 'Choose your preferred color theme',
+    darkMode: 'Dark',
+    lightMode: 'Light',
     about: 'About',
     version: 'Version'
   },

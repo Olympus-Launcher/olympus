@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react'
-import { project } from '../config'
+import { project, ThemeMode, themes } from '../config'
 
-export default function TitleBar() {
+interface TitleBarProps {
+  theme: ThemeMode
+}
+
+export default function TitleBar({ theme }: TitleBarProps) {
   const [isMaximized, setIsMaximized] = useState(false)
+
+  const themeColors = themes[theme]
 
   useEffect(() => {
     const checkMaximized = async () => {
@@ -27,20 +33,28 @@ export default function TitleBar() {
   }
 
   return (
-    <div className="h-10 bg-dark-surface border-b border-dark-border flex items-center justify-between select-none" style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}>
+    <div 
+      className="h-10 border-b flex items-center justify-between select-none"
+      style={{ 
+        backgroundColor: themeColors.surface, 
+        borderColor: themeColors.border,
+        WebkitAppRegion: 'drag' 
+      } as React.CSSProperties}
+    >
       <div className="flex items-center gap-2 px-4">
         <div className="w-5 h-5 bg-gradient-to-br from-primary-500 to-primary-700 rounded flex items-center justify-center">
           <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
           </svg>
         </div>
-        <span className="text-sm text-dark-text font-medium">{project.name}</span>
+        <span className="text-sm font-medium" style={{ color: themeColors.text }}>{project.name}</span>
       </div>
 
       <div className="flex" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
         <button
           onClick={handleMinimize}
-          className="w-12 h-10 flex items-center justify-center text-dark-textSecondary hover:bg-dark-card transition-colors"
+          className="w-12 h-10 flex items-center justify-center transition-colors"
+          style={{ color: themeColors.textSecondary }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
@@ -48,7 +62,8 @@ export default function TitleBar() {
         </button>
         <button
           onClick={handleMaximize}
-          className="w-12 h-10 flex items-center justify-center text-dark-textSecondary hover:bg-dark-card transition-colors"
+          className="w-12 h-10 flex items-center justify-center transition-colors"
+          style={{ color: themeColors.textSecondary }}
         >
           {isMaximized ? (
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,7 +77,8 @@ export default function TitleBar() {
         </button>
         <button
           onClick={handleClose}
-          className="w-12 h-10 flex items-center justify-center text-dark-textSecondary hover:bg-red-600 hover:text-white transition-colors"
+          className="w-12 h-10 flex items-center justify-center transition-colors hover:bg-red-600 hover:text-white"
+          style={{ color: themeColors.textSecondary }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

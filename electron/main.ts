@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain, shell, dialog } from 'electron'
 import path from 'path'
+import fs from 'fs'
 import log from 'electron-log'
 import Store from 'electron-store'
 import { detectSteamGames, detectEpicGames, detectEAGames, GameInfo } from './gameDetector'
@@ -8,8 +9,14 @@ log.transports.file.level = 'info'
 log.transports.console.level = 'debug'
 log.info('Application starting...')
 
+const configDir = path.join(app.getPath('userData'), 'config')
+if (!fs.existsSync(configDir)) {
+  fs.mkdirSync(configDir, { recursive: true })
+}
+
 const store = new Store({
-  name: 'game-launcher-data',
+  cwd: configDir,
+  name: 'settings',
   defaults: {
     games: [],
     settings: {

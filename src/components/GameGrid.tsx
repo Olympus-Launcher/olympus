@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { GameInfo } from '../types'
 import GameCard from './GameCard'
-import { labels } from '../config'
+import { labels, ThemeColors } from '../config'
 
 interface GameGridProps {
   games: GameInfo[]
@@ -11,6 +11,7 @@ interface GameGridProps {
   isEmpty: boolean
   isScanning: boolean
   onScan: () => void
+  themeColors: ThemeColors
 }
 
 export default function GameGrid({ 
@@ -20,7 +21,8 @@ export default function GameGrid({
   onToggleFavorite,
   isEmpty,
   isScanning,
-  onScan
+  onScan,
+  themeColors
 }: GameGridProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
@@ -28,14 +30,14 @@ export default function GameGrid({
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-8">
         <div className="text-center max-w-md">
-          <div className="w-24 h-24 mx-auto mb-6 rounded-2xl placeholder-icon flex items-center justify-center">
-            <svg className="w-12 h-12 text-dark-textSecondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-24 h-24 mx-auto mb-6 rounded-2xl flex items-center justify-center" style={{ backgroundColor: themeColors.surface }}>
+            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: themeColors.textSecondary }}>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-dark-text mb-2">{labels.gameGrid.noGamesFound}</h2>
-          <p className="text-dark-textSecondary mb-6">
+          <h2 className="text-xl font-semibold mb-2" style={{ color: themeColors.text }}>{labels.gameGrid.noGamesFound}</h2>
+          <p className="mb-6" style={{ color: themeColors.textSecondary }}>
             {labels.gameGrid.noGamesDescription}
           </p>
           <div className="flex gap-3 justify-center">
@@ -70,11 +72,11 @@ export default function GameGrid({
         <div className="flex gap-2">
           <button
             onClick={() => setViewMode('grid')}
-            className={`p-2 rounded-lg transition-colors ${
-              viewMode === 'grid' 
-                ? 'bg-primary-600 text-white' 
-                : 'bg-dark-card text-dark-textSecondary hover:text-dark-text'
-            }`}
+            className="p-2 rounded-lg transition-colors"
+            style={{ 
+              backgroundColor: viewMode === 'grid' ? '#0284c7' : themeColors.card,
+              color: viewMode === 'grid' ? 'white' : themeColors.textSecondary
+            }}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -82,11 +84,11 @@ export default function GameGrid({
           </button>
           <button
             onClick={() => setViewMode('list')}
-            className={`p-2 rounded-lg transition-colors ${
-              viewMode === 'list' 
-                ? 'bg-primary-600 text-white' 
-                : 'bg-dark-card text-dark-textSecondary hover:text-dark-text'
-            }`}
+            className="p-2 rounded-lg transition-colors"
+            style={{ 
+              backgroundColor: viewMode === 'list' ? '#0284c7' : themeColors.card,
+              color: viewMode === 'list' ? 'white' : themeColors.textSecondary
+            }}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -95,7 +97,7 @@ export default function GameGrid({
         </div>
 
         {isScanning && (
-          <div className="flex items-center gap-2 text-dark-textSecondary">
+          <div className="flex items-center gap-2" style={{ color: themeColors.textSecondary }}>
             <div className="w-4 h-4 border-2 border-primary-500/30 border-t-primary-500 rounded-full animate-spin"></div>
             <span className="text-sm">{labels.gameGrid.scanningForGames}</span>
           </div>
@@ -114,6 +116,7 @@ export default function GameGrid({
             onLaunch={onLaunch}
             onRemove={onRemove}
             onToggleFavorite={onToggleFavorite}
+            themeColors={themeColors}
           />
         ))}
       </div>

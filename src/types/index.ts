@@ -1,4 +1,4 @@
-import { StoreType } from '../config'
+import { StoreType, ThemeMode } from '../config'
 
 export interface GameInfo {
   id: string
@@ -13,7 +13,7 @@ export interface GameInfo {
 }
 
 export interface Settings {
-  theme: string
+  theme: ThemeMode
   scanOnStartup: boolean
 }
 

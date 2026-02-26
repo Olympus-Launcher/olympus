@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Settings } from '../types'
-import { project, labels } from '../config'
+import { project, labels, themesList, ThemeMode, themes } from '../config'
 
 interface SettingsViewProps {
   settings: Settings
@@ -11,25 +11,41 @@ interface SettingsViewProps {
 
 export default function SettingsView({ settings, onSave, onScanGames, isScanning }: SettingsViewProps) {
   const [localSettings, setLocalSettings] = useState<Settings>(settings)
+  const [themeDropdownOpen, setThemeDropdownOpen] = useState(false)
+
+  useEffect(() => {
+    setLocalSettings(settings)
+  }, [settings])
+
+  const themeColors = themes[localSettings.theme]
 
   const handleSave = async () => {
     await onSave(localSettings)
   }
 
+  const handleThemeChange = (theme: ThemeMode) => {
+    const newSettings = { ...localSettings, theme }
+    setLocalSettings(newSettings)
+    setThemeDropdownOpen(false)
+    onSave(newSettings)
+  }
+
+  const currentTheme = themesList.find(t => t.id === localSettings.theme) || themesList[1]
+
   return (
-    <div className="flex-1 overflow-y-auto p-6">
+    <div className="flex-1 overflow-y-auto p-6" style={{ backgroundColor: themeColors.bg }}>
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-semibold text-dark-text mb-6">{labels.settings.title}</h1>
+        <h1 className="text-2xl font-semibold mb-6" style={{ color: themeColors.text }}>{labels.settings.title}</h1>
 
         <div className="space-y-6">
-          <div className="bg-dark-card border border-dark-border rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-dark-text mb-4">{labels.settings.library}</h2>
+          <div className="rounded-xl p-6" style={{ backgroundColor: themeColors.card, border: `1px solid ${themeColors.border}` }}>
+            <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>{labels.settings.library}</h2>
             
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-dark-text font-medium">{labels.settings.scanOnStartup}</p>
-                  <p className="text-sm text-dark-textSecondary">{labels.settings.scanOnStartupDescription}</p>
+                  <p className="font-medium" style={{ color: themeColors.text }}>{labels.settings.scanOnStartup}</p>
+                  <p className="text-sm" style={{ color: themeColors.textSecondary }}>{labels.settings.scanOnStartupDescription}</p>
                 </div>
                 <button
                   onClick={() => {
@@ -37,8 +53,9 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                     setTimeout(handleSave, 0)
                   }}
                   className={`relative w-12 h-6 rounded-full transition-colors ${
-                    localSettings.scanOnStartup ? 'bg-primary-600' : 'bg-dark-border'
+                    localSettings.scanOnStartup ? 'bg-primary-600' : ''
                   }`}
+                  style={{ backgroundColor: localSettings.scanOnStartup ? undefined : themeColors.border }}
                 >
                   <span 
                     className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
@@ -48,9 +65,9 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                 </button>
               </div>
 
-              <div className="pt-4 border-t border-dark-border">
-                <p className="text-dark-text font-medium mb-2">{labels.settings.manualScan}</p>
-                <p className="text-sm text-dark-textSecondary mb-4">
+              <div className="pt-4 border-t" style={{ borderColor: themeColors.border }}>
+                <p className="font-medium mb-2" style={{ color: themeColors.text }}>{labels.settings.manualScan}</p>
+                <p className="text-sm mb-4" style={{ color: themeColors.textSecondary }}>
                   {labels.settings.manualScanDescription}
                 </p>
                 <button
@@ -76,39 +93,62 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
             </div>
           </div>
 
-          <div className="bg-dark-card border border-dark-border rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-dark-text mb-4">{labels.settings.appearance}</h2>
+          <div className="rounded-xl p-6" style={{ backgroundColor: themeColors.card, border: `1px solid ${themeColors.border}` }}>
+            <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>{labels.settings.appearance}</h2>
             
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-dark-text font-medium">{labels.settings.darkMode}</p>
-                  <p className="text-sm text-dark-textSecondary">{labels.settings.darkModeDescription}</p>
+              <div>
+                <p className="font-medium mb-1" style={{ color: themeColors.text }}>{labels.settings.theme}</p>
+                <p className="text-sm mb-3" style={{ color: themeColors.textSecondary }}>{labels.settings.themeDescription}</p>
+                
+                <div className="relative">
+                  <button
+                    onClick={() => setThemeDropdownOpen(!themeDropdownOpen)}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors"
+                    style={{ 
+                      backgroundColor: themeColors.surface, 
+                      border: `1px solid ${themeColors.border}`,
+                      color: themeColors.text 
+                    }}
+                  >
+                    <span>{currentTheme.name}</span>
+                    <svg className={`w-5 h-5 transition-transform ${themeDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  {themeDropdownOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-1 rounded-lg shadow-xl z-10 overflow-hidden" style={{ backgroundColor: themeColors.surface, border: `1px solid ${themeColors.border}` }}>
+                      {themesList.map((theme) => (
+                        <button
+                          key={theme.id}
+                          onClick={() => handleThemeChange(theme.id)}
+                          className="w-full flex items-center justify-between px-4 py-3 text-left transition-colors"
+                          style={{ 
+                            backgroundColor: localSettings.theme === theme.id ? '#0284c7' : undefined,
+                            color: localSettings.theme === theme.id ? 'white' : themeColors.text 
+                          }}
+                        >
+                          <span>{theme.name}</span>
+                          {localSettings.theme === theme.id && (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <button
-                  onClick={() => {
-                    setLocalSettings({ ...localSettings, theme: localSettings.theme === 'dark' ? 'light' : 'dark' })
-                    setTimeout(handleSave, 0)
-                  }}
-                  className={`relative w-12 h-6 rounded-full transition-colors ${
-                    localSettings.theme === 'dark' ? 'bg-primary-600' : 'bg-dark-border'
-                  }`}
-                >
-                  <span 
-                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                      localSettings.theme === 'dark' ? 'left-7' : 'left-1'
-                    }`}
-                  />
-                </button>
               </div>
             </div>
           </div>
 
-          <div className="bg-dark-card border border-dark-border rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-dark-text mb-4">{labels.settings.about}</h2>
+          <div className="rounded-xl p-6" style={{ backgroundColor: themeColors.card, border: `1px solid ${themeColors.border}` }}>
+            <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>{labels.settings.about}</h2>
             
-            <div className="space-y-2 text-dark-textSecondary">
-              <p><span className="text-dark-text">{project.name}</span> {labels.app.version}{project.version}</p>
+            <div className="space-y-2" style={{ color: themeColors.textSecondary }}>
+              <p><span style={{ color: themeColors.text }}>{project.name}</span> {labels.app.version}{project.version}</p>
               <p>{project.description}</p>
               <p className="text-sm">Supports {project.supportedStoreNames.steam}, {project.supportedStoreNames.epic}, {project.supportedStoreNames.ea}, and {project.supportedStoreNames.custom} games</p>
             </div>

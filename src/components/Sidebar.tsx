@@ -1,10 +1,11 @@
 import { ViewType } from '../types'
-import { project, labels } from '../config'
+import { project, labels, ThemeMode, themes } from '../config'
 
 interface SidebarProps {
   currentView: ViewType
   onViewChange: (view: ViewType) => void
   gameCounts: Record<string, number>
+  theme: ThemeMode
 }
 
 const menuItems: { id: ViewType; label: string; icon: JSX.Element }[] = [
@@ -83,10 +84,18 @@ const menuItems: { id: ViewType; label: string; icon: JSX.Element }[] = [
   }
 ]
 
-export default function Sidebar({ currentView, onViewChange, gameCounts }: SidebarProps) {
+export default function Sidebar({ currentView, onViewChange, gameCounts, theme }: SidebarProps) {
+  const themeColors = themes[theme]
+  
   return (
-    <aside className="w-64 bg-dark-surface border-r border-dark-border flex flex-col">
-      <div className="p-6 border-b border-dark-border">
+    <aside 
+      className="w-64 border-r flex flex-col"
+      style={{ 
+        backgroundColor: themeColors.surface, 
+        borderColor: themeColors.border 
+      }}
+    >
+      <div className="p-6 border-b" style={{ borderColor: themeColors.border }}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,8 +103,8 @@ export default function Sidebar({ currentView, onViewChange, gameCounts }: Sideb
             </svg>
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-dark-text">{project.name}</h1>
-            <p className="text-xs text-dark-textSecondary">Your PC Games</p>
+            <h1 className="text-lg font-semibold" style={{ color: themeColors.text }}>{project.name}</h1>
+            <p className="text-xs" style={{ color: themeColors.textSecondary }}>{labels.sidebar.yourGames}</p>
           </div>
         </div>
       </div>
@@ -108,15 +117,26 @@ export default function Sidebar({ currentView, onViewChange, gameCounts }: Sideb
             className={`sidebar-item w-full flex items-center justify-between px-4 py-3 rounded-lg text-left ${
               currentView === item.id 
                 ? 'active bg-primary-500/10 text-primary-400' 
-                : 'text-dark-textSecondary hover:text-dark-text'
+                : 'hover:bg-opacity-10'
             }`}
+            style={{ 
+              color: currentView === item.id ? undefined : themeColors.textSecondary 
+            }}
           >
             <div className="flex items-center gap-3">
               {item.icon}
-              <span className="text-sm font-medium">{item.label}</span>
+              <span className="text-sm font-medium" style={{ color: currentView === item.id ? '#38bdf8' : themeColors.text }}>
+                {item.label}
+              </span>
             </div>
             {item.id !== 'settings' && gameCounts[item.id] > 0 && (
-              <span className="text-xs bg-dark-card px-2 py-1 rounded-full text-dark-textSecondary">
+              <span 
+                className="text-xs px-2 py-1 rounded-full"
+                style={{ 
+                  backgroundColor: themeColors.card, 
+                  color: themeColors.textSecondary 
+                }}
+              >
                 {gameCounts[item.id]}
               </span>
             )}
@@ -124,8 +144,8 @@ export default function Sidebar({ currentView, onViewChange, gameCounts }: Sideb
         ))}
       </nav>
 
-      <div className="p-4 border-t border-dark-border">
-        <p className="text-xs text-dark-textSecondary text-center">
+      <div className="p-4 border-t" style={{ borderColor: themeColors.border }}>
+        <p className="text-xs text-center" style={{ color: themeColors.textSecondary }}>
           {project.name} {labels.app.version}{project.version}
         </p>
       </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { GameInfo } from '../types'
-import { labels, theme } from '../config'
+import { labels, theme, ThemeColors } from '../config'
 
 interface GameCardProps {
   game: GameInfo
@@ -8,6 +8,7 @@ interface GameCardProps {
   onLaunch: (game: GameInfo) => void
   onRemove: (gameId: string) => void
   onToggleFavorite: (gameId: string) => void
+  themeColors: ThemeColors
 }
 
 const storeColors = theme.colors.store
@@ -35,7 +36,7 @@ const storeLogos = {
   )
 }
 
-export default function GameCard({ game, viewMode, onLaunch, onRemove, onToggleFavorite }: GameCardProps) {
+export default function GameCard({ game, viewMode, onLaunch, onRemove, onToggleFavorite, themeColors }: GameCardProps) {
   const [showMenu, setShowMenu] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
@@ -56,23 +57,24 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onToggleF
   if (viewMode === 'list') {
     return (
       <div 
-        className="game-card flex items-center gap-4 p-4 bg-dark-card rounded-xl border border-dark-border hover:border-primary-500/30"
+        className="game-card flex items-center gap-4 p-4 rounded-xl border hover:border-primary-500/30"
+        style={{ backgroundColor: themeColors.card, borderColor: themeColors.border }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => { setIsHovered(false); setShowMenu(false) }}
       >
-        <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 placeholder-icon bg-dark-surface">
+        <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 placeholder-icon" style={{ backgroundColor: themeColors.surface }}>
           {game.coverImage ? (
             <img src={`file://${game.coverImage}`} alt={game.name} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-dark-textSecondary">
+            <div className="w-full h-full flex items-center justify-center text-2xl font-bold" style={{ color: themeColors.textSecondary }}>
               {game.name.charAt(0).toUpperCase()}
             </div>
           )}
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-dark-text truncate">{game.name}</h3>
-          <p className="text-sm text-dark-textSecondary">{formatLastPlayed(game.lastPlayed)}</p>
+          <h3 className="font-semibold truncate" style={{ color: themeColors.text }}>{game.name}</h3>
+          <p className="text-sm" style={{ color: themeColors.textSecondary }}>{formatLastPlayed(game.lastPlayed)}</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -93,7 +95,8 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onToggleF
             <div className="relative">
               <button
                 onClick={() => setShowMenu(!showMenu)}
-                className="p-2 text-dark-textSecondary hover:text-dark-text"
+                className="p-2 hover:text-white"
+                style={{ color: themeColors.textSecondary }}
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
@@ -101,10 +104,11 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onToggleF
               </button>
 
               {showMenu && (
-                <div className="absolute right-0 top-full mt-1 w-48 bg-dark-surface border border-dark-border rounded-lg shadow-xl z-10 overflow-hidden">
+                <div className="absolute right-0 top-full mt-1 w-48 rounded-lg shadow-xl z-10 overflow-hidden" style={{ backgroundColor: themeColors.surface, borderColor: themeColors.border, borderWidth: 1, borderStyle: 'solid' }}>
                   <button
                     onClick={() => { onLaunch(game); setShowMenu(false) }}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-left text-dark-text hover:bg-dark-card"
+                    className="w-full flex items-center gap-2 px-4 py-2 text-left hover:bg-white/10"
+                    style={{ color: themeColors.text }}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -114,7 +118,8 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onToggleF
                   </button>
                   <button
                     onClick={() => { onToggleFavorite(game.id); setShowMenu(false) }}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-left text-dark-text hover:bg-dark-card"
+                    className="w-full flex items-center gap-2 px-4 py-2 text-left hover:bg-white/10"
+                    style={{ color: themeColors.text }}
                   >
                     <svg className="w-4 h-4" fill={game.isFavorite ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -123,7 +128,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onToggleF
                   </button>
                   <button
                     onClick={() => { onRemove(game.id); setShowMenu(false) }}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-left text-red-400 hover:bg-dark-card"
+                    className="w-full flex items-center gap-2 px-4 py-2 text-left text-red-400 hover:bg-white/10"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -141,7 +146,8 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onToggleF
 
   return (
     <div 
-      className="game-card group relative bg-dark-card rounded-xl overflow-hidden border border-dark-border"
+      className="game-card group relative rounded-xl overflow-hidden border"
+      style={{ backgroundColor: themeColors.card, borderColor: themeColors.border }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => { setIsHovered(false); setShowMenu(false) }}
     >
@@ -153,8 +159,8 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onToggleF
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full placeholder-icon flex items-center justify-center">
-            <div className="text-6xl font-bold text-dark-textSecondary opacity-30">
+          <div className="w-full h-full placeholder-icon flex items-center justify-center" style={{ backgroundColor: themeColors.surface }}>
+            <div className="text-6xl font-bold opacity-30" style={{ color: themeColors.textSecondary }}>
               {game.name.charAt(0).toUpperCase()}
             </div>
           </div>
@@ -210,10 +216,11 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onToggleF
           </button>
 
           {showMenu && (
-            <div className="absolute right-0 top-full mt-1 w-40 bg-dark-surface border border-dark-border rounded-lg shadow-xl z-10 overflow-hidden">
+            <div className="absolute right-0 top-full mt-1 w-40 rounded-lg shadow-xl z-10 overflow-hidden" style={{ backgroundColor: themeColors.surface, borderColor: themeColors.border, borderWidth: 1, borderStyle: 'solid' }}>
               <button
                 onClick={() => { onLaunch(game); setShowMenu(false) }}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left text-dark-text hover:bg-dark-card"
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10"
+                style={{ color: themeColors.text }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -222,7 +229,8 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onToggleF
               </button>
               <button
                 onClick={() => { onToggleFavorite(game.id); setShowMenu(false) }}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left text-dark-text hover:bg-dark-card"
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10"
+                style={{ color: themeColors.text }}
               >
                 <svg className="w-4 h-4" fill={game.isFavorite ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -231,7 +239,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onToggleF
               </button>
               <button
                 onClick={() => { onRemove(game.id); setShowMenu(false) }}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left text-red-400 hover:bg-dark-card"
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left text-red-400 hover:bg-white/10"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -244,8 +252,8 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onToggleF
       </div>
 
       <div className="p-3">
-        <h3 className="font-medium text-dark-text text-sm truncate">{game.name}</h3>
-        <p className="text-xs text-dark-textSecondary mt-1 truncate">{formatLastPlayed(game.lastPlayed)}</p>
+        <h3 className="font-medium text-sm truncate" style={{ color: themeColors.text }}>{game.name}</h3>
+        <p className="text-xs mt-1 truncate" style={{ color: themeColors.textSecondary }}>{formatLastPlayed(game.lastPlayed)}</p>
       </div>
     </div>
   )
