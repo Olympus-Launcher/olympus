@@ -4,7 +4,6 @@ import fs from 'fs'
 import { exec } from 'child_process'
 import log from 'electron-log'
 import Store from 'electron-store'
-import { getUserDrives } from './getUserDrives'
 import { getSteamGames, getSteamLaunchUrl, getSteamInstallPath } from './getSteamGames'
 import { getEpicGames } from './getEpicGames'
 import { GameInfo, Settings } from './types'
@@ -156,8 +155,8 @@ ipcMain.handle('save-games', async (_, games: GameInfo[]) => {
   return true
 })
 
-ipcMain.handle('scan-games', async (event, drives?: string[]) => {
-  log.info('IPC: scan-games called', drives ? `with drives: ${drives.join(', ')}` : 'with default drives')
+ipcMain.handle('scan-games', async (event) => {
+  log.info('IPC: scan-games called')
   try {
     const sendProgress = (current: number, total: number, currentGame: string, store: string) => {
       event.sender.send('scan-progress', { current, total, currentGame, store })
@@ -167,7 +166,7 @@ ipcMain.handle('scan-games', async (event, drives?: string[]) => {
     const existingIds = new Set(existingGames.map(g => g.id))
     
     sendProgress(0, 0, '', 'steam')
-    const steamGames = await getSteamGames(drives)
+    const steamGames = await getSteamGames()
     
     sendProgress(0, 0, '', 'epic')
     const epicGames = await getEpicGames()
@@ -188,17 +187,6 @@ ipcMain.handle('scan-games', async (event, drives?: string[]) => {
     return { games: returnedGames, newCount: newGames.length }
   } catch (error) {
     log.error('Error scanning games:', error)
-    throw error
-  }
-})
-
-ipcMain.handle('get-drives', async () => {
-  log.info('IPC: get-drives called')
-  try {
-    const drives = await getUserDrives()
-    return drives
-  } catch (error) {
-    log.error('Error getting drives:', error)
     throw error
   }
 })

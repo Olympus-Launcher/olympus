@@ -71,10 +71,10 @@ function App() {
     }
   }
 
-  const scanForGames = async (drives?: string[]) => {
+  const scanForGames = async () => {
     setIsScanning(true)
     try {
-      const result = await window.electronAPI.scanGames(drives)
+      const result = await window.electronAPI.scanGames()
       setGames(result.games)
     } catch (error) {
       console.error('Error scanning games:', error)
@@ -258,8 +258,8 @@ function App() {
                     {currentView === 'all' && labels.sidebar.allGames}
                     {currentView === 'favorites' && labels.sidebar.favorites}
                     {currentView === 'recent' && labels.sidebar.recentlyPlayed}
-                    {currentView === 'steam' && project.supportedStoreNames.steam + ' Games'}
-                    {currentView === 'epic' && project.supportedStoreNames.epic + ' Games'}
+                    {currentView === 'steam' && project.supportedStoreNames.steam + ' Library'}
+                    {currentView === 'epic' && project.supportedStoreNames.epic + ' Library'}
                     {currentView === 'custom' && project.supportedStoreNames.custom + ' Games'}
                   </h1>
                   <p className="text-sm mt-1" style={{ color: themeColors.textSecondary }}>

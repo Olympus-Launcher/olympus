@@ -5,25 +5,6 @@ const fs = require("fs");
 const child_process = require("child_process");
 const log = require("electron-log");
 const Store = require("electron-store");
-async function getUserDrives() {
-  log.info("Getting user drives...");
-  const drives = [];
-  if (process.platform === "win32") {
-    const letters = "CDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-    for (const letter of letters) {
-      const drivePath = `${letter}:\\`;
-      try {
-        fs.accessSync(drivePath, fs.constants.R_OK);
-        drives.push(drivePath);
-      } catch {
-      }
-    }
-  } else {
-    drives.push("/");
-  }
-  log.info(`Found drives: ${drives.join(", ")}`);
-  return drives;
-}
 async function fileExists(filePath) {
   try {
     await fs.promises.access(filePath);
@@ -472,8 +453,8 @@ electron.ipcMain.handle("save-games", async (_, games) => {
   store.set("games", games);
   return true;
 });
-electron.ipcMain.handle("scan-games", async (event, drives) => {
-  log.info("IPC: scan-games called", drives ? `with drives: ${drives.join(", ")}` : "with default drives");
+electron.ipcMain.handle("scan-games", async (event) => {
+  log.info("IPC: scan-games called");
   try {
     const sendProgress = (current, total, currentGame, store2) => {
       event.sender.send("scan-progress", { current, total, currentGame, store: store2 });
@@ -481,7 +462,7 @@ electron.ipcMain.handle("scan-games", async (event, drives) => {
     const existingGames = store.get("games");
     const existingIds = new Set(existingGames.map((g) => g.id));
     sendProgress(0, 0, "", "steam");
-    const steamGames = await getSteamGames(drives);
+    const steamGames = await getSteamGames();
     sendProgress(0, 0, "", "epic");
     const epicGames = await getEpicGames();
     const allDetectedGames = [...steamGames, ...epicGames];
@@ -495,16 +476,6 @@ electron.ipcMain.handle("scan-games", async (event, drives) => {
     return { games: returnedGames, newCount: newGames.length };
   } catch (error) {
     log.error("Error scanning games:", error);
-    throw error;
-  }
-});
-electron.ipcMain.handle("get-drives", async () => {
-  log.info("IPC: get-drives called");
-  try {
-    const drives = await getUserDrives();
-    return drives;
-  } catch (error) {
-    log.error("Error getting drives:", error);
     throw error;
   }
 });

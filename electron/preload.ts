@@ -26,8 +26,7 @@ export interface ScanResult {
 const electronAPI = {
   getGames: (): Promise<GameInfo[]> => ipcRenderer.invoke('get-games'),
   saveGames: (games: GameInfo[]): Promise<boolean> => ipcRenderer.invoke('save-games', games),
-  scanGames: (drives?: string[]): Promise<ScanResult> => ipcRenderer.invoke('scan-games', drives),
-  getDrives: (): Promise<string[]> => ipcRenderer.invoke('get-drives'),
+  scanGames: (): Promise<ScanResult> => ipcRenderer.invoke('scan-games'),
   addGame: (game: Omit<GameInfo, 'id'>): Promise<GameInfo> => ipcRenderer.invoke('add-game', game),
   removeGame: (gameId: string): Promise<boolean> => ipcRenderer.invoke('remove-game', gameId),
   launchGame: (game: GameInfo): Promise<boolean> => ipcRenderer.invoke('launch-game', game),

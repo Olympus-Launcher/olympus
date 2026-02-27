@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Settings } from '../types'
 import { project, labels, themesList, ThemeMode, themes } from '../config'
-import DriveSelector from './DriveSelector'
 
 interface SettingsViewProps {
   settings: Settings
   onSave: (settings: Settings) => void
-  onScanGames: (drives: string[]) => void
+  onScanGames: () => void
   isScanning: boolean
 }
 
@@ -16,7 +15,6 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
   const [localSettings, setLocalSettings] = useState<Settings>(settings)
   const [themeDropdownOpen, setThemeDropdownOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<SettingsTab>('library')
-  const [showDriveSelector, setShowDriveSelector] = useState(false)
 
   useEffect(() => {
     setLocalSettings(settings)
@@ -36,15 +34,6 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
   }
 
   const currentTheme = themesList.find(t => t.id === localSettings.theme) || themesList[1]
-
-  const handleScanClick = () => {
-    setShowDriveSelector(true)
-  }
-
-  const handleDriveSelect = (selectedDrives: string[]) => {
-    setShowDriveSelector(false)
-    onScanGames(selectedDrives)
-  }
 
   const tabs: { id: SettingsTab; label: string }[] = [
     { id: 'library', label: labels.settings.library },
@@ -109,7 +98,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                     {labels.settings.manualScanDescription}
                   </p>
                   <button
-                    onClick={handleScanClick}
+                    onClick={onScanGames}
                     disabled={isScanning}
                     className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-600/50 text-white rounded-lg transition-colors"
                   >
@@ -198,14 +187,6 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
           </div>
         )}
       </div>
-
-      {showDriveSelector && (
-        <DriveSelector
-          onSelect={handleDriveSelect}
-          onClose={() => setShowDriveSelector(false)}
-          isScanning={isScanning}
-        />
-      )}
     </div>
   )
 }
