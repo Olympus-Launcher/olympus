@@ -272,13 +272,12 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                 <p className="text-2xl font-bold" style={{ color: themeColors.text }}>{project.name}</p>
                 <p>Version {project.version}</p>
                 <p>{project.description}</p>
-                <p className="text-sm">Supports {project.supportedStoreNames.steam}, {project.supportedStoreNames.epic}, and {project.supportedStoreNames.custom} games</p>
               </div>
             </div>
 
             <div className="rounded-xl p-6" style={{ backgroundColor: themeColors.card, border: `1px solid ${themeColors.border}` }}>
               <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>Updates</h2>
-              
+
               <div className="space-y-4">
                 {updateStatus?.status === 'checking' || isCheckingUpdate ? (
                   <div className="flex items-center gap-3" style={{ color: themeColors.textSecondary }}>

@@ -58,21 +58,7 @@ export default function Sidebar({ currentView, onViewChange, gameCounts, theme }
         borderColor: themeColors.border 
       }}
     >
-      <div className="p-6 border-b" style={{ borderColor: themeColors.border }}>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-            </svg>
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold" style={{ color: themeColors.text }}>{project.name}</h1>
-            <p className="text-xs" style={{ color: themeColors.textSecondary }}>{labels.sidebar.yourGames}</p>
-          </div>
-        </div>
-      </div>
-
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 p-4 space-y-1 pt-8">
         {menuItems.map((item) => (
           <button
             key={item.id}
