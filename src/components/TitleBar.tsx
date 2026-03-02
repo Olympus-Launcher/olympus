@@ -42,11 +42,7 @@ export default function TitleBar({ theme }: TitleBarProps) {
       } as React.CSSProperties}
     >
       <div className="flex items-center gap-2 px-4">
-        <div className="w-5 h-5 bg-gradient-to-br from-primary-500 to-primary-700 rounded flex items-center justify-center">
-          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-          </svg>
-        </div>
+        <img src="./logo.png" alt="Logo" className="w-5 h-5 object-contain" draggable="false" />
         <span className="text-sm font-medium" style={{ color: themeColors.text }}>{project.name}</span>
       </div>
 

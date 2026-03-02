@@ -1,6 +1,6 @@
 export const project = {
-  name: 'Olympus Game Launcher',
-  version: '1.0.0',
+  name: 'Olympus Frontend',
+  version: '1.0.1',
   description: 'Let your games reside in one place, and launch them from there.',
   author: 'Salierus',
   supportedStores: ['steam', 'epic', 'custom'] as const,
