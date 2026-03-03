@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Settings, GameInfo } from '../types'
 import { project, labels, themesList, ThemeMode, themes } from '../config'
+import logoBigUrl from '../assets/logo-big.png'
 
 type SettingsTab = 'library' | 'appearance' | 'hidden' | 'about'
 
@@ -271,7 +272,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                 <p className="text-2xl font-bold text-center" style={{ color: themeColors.text }}>{project.name}</p>
                 <p className="text-center">Version {project.version}</p>
                 <div className="flex justify-center py-4">
-                  <img src="/logo-big.png" alt="Logo" className="h-40 w-auto object-contain" draggable="false" />
+                  <img src={logoBigUrl} alt="Logo" className="h-40 w-auto object-contain" draggable="false" />
                 </div>
                 <p>{project.description}<br></br><br></br>
                   <span>This app is in early development.</span><br></br>

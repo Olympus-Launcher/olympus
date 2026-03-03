@@ -141,3 +141,5 @@ vite.config.ts.timestamp-*
 # Project Files / Dist
 release/release/
 release/
+dist/
+dist-electron/

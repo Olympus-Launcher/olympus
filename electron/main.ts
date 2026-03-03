@@ -36,6 +36,7 @@ const store = new Store({
   name: 'settings',
   defaults: {
     games: [],
+    favorites: [],
     settings: {
       theme: 'dark',
       scanOnStartup: true
@@ -194,6 +195,8 @@ ipcMain.handle('scan-games', async (event) => {
 
     const existingGames = store.get('games') as GameInfo[]
     const existingIds = new Set(existingGames.map(g => g.id))
+    const customGames = existingGames.filter(g => g.store === 'custom')
+    const nonCustomGames = existingGames.filter(g => g.store !== 'custom')
     
     sendProgress(0, 0, '', 'steam')
     const steamGames = await getSteamGames()
@@ -202,20 +205,34 @@ ipcMain.handle('scan-games', async (event) => {
     const epicGames = await getEpicGames()
 
     const allDetectedGames = [...steamGames, ...epicGames]
+    const detectedIds = new Set(allDetectedGames.map(g => g.id))
+
+    const keptGames = nonCustomGames.filter(g => detectedIds.has(g.id))
+    
+    const removedGames = nonCustomGames.filter(g => !detectedIds.has(g.id))
+    if (removedGames.length > 0) {
+      log.info(`Removing ${removedGames.length} uninstalled games: ${removedGames.map(g => g.name).join(', ')}`)
+    }
+
     const newGames = allDetectedGames.filter(g => !existingIds.has(g.id))
 
-    const updatedGames = [...existingGames, ...newGames]
+    const updatedGames = [...customGames, ...keptGames, ...newGames]
     
     const realGames = updatedGames.filter(g => !g.id.startsWith('dev-'))
     store.set('games', realGames)
 
+    const favorites = store.get('favorites') as string[]
+    const favoriteIds = new Set(favorites)
     const visibleGames = realGames.filter(g => !g.isHidden)
-    const returnedGames = isDev ? [...placeholderGames.filter(g => !g.isHidden), ...visibleGames] : visibleGames
+    const returnedGames = (isDev ? [...placeholderGames.filter(g => !g.isHidden), ...visibleGames] : visibleGames).map(g => ({
+      ...g,
+      isFavorite: favoriteIds.has(g.id)
+    }))
 
     sendProgress(newGames.length, newGames.length, '', 'complete')
     
-    log.info(`Scan complete. Found ${newGames.length} new games`)
-    return { games: returnedGames, newCount: newGames.length }
+    log.info(`Scan complete. Found ${newGames.length} new games, removed ${removedGames.length} uninstalled games`)
+    return { games: returnedGames, newCount: newGames.length, removedCount: removedGames.length }
   } catch (error) {
     log.error('Error scanning games:', error)
     throw error
@@ -357,6 +374,27 @@ ipcMain.handle('get-settings', async () => {
 ipcMain.handle('save-settings', async (_, settings: { theme: string; scanOnStartup: boolean }) => {
   store.set('settings', settings)
   return true
+})
+
+ipcMain.handle('get-favorites', async () => {
+  return store.get('favorites') as string[]
+})
+
+ipcMain.handle('save-favorites', async (_, favoriteIds: string[]) => {
+  store.set('favorites', favoriteIds)
+  return true
+})
+
+ipcMain.handle('toggle-favorite', async (_, gameId: string) => {
+  const favorites = store.get('favorites') as string[]
+  const index = favorites.indexOf(gameId)
+  if (index === -1) {
+    favorites.push(gameId)
+  } else {
+    favorites.splice(index, 1)
+  }
+  store.set('favorites', favorites)
+  return favorites
 })
 
 ipcMain.handle('window-minimize', () => {

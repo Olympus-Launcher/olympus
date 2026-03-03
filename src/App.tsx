@@ -63,22 +63,30 @@ function App() {
   const loadInitialData = async () => {
     try {
       console.log('Loading initial data...')
-      const [loadedGames, loadedSettings] = await Promise.all([
+      const [loadedGames, loadedSettings, favorites] = await Promise.all([
         window.electronAPI.getGames(),
-        window.electronAPI.getSettings()
+        window.electronAPI.getSettings(),
+        window.electronAPI.getFavorites()
       ])
       console.log('Games loaded:', loadedGames.length)
       console.log('Settings loaded:', loadedSettings)
+      console.log('Favorites loaded:', favorites)
+      
+      const favoriteSet = new Set(favorites)
+      const gamesWithFavorites = loadedGames.map(g => ({
+        ...g,
+        isFavorite: favoriteSet.has(g.id)
+      }))
       
       const settingsWithDefaults: Settings = {
         theme: loadedSettings?.theme || 'dark',
         scanOnStartup: loadedSettings?.scanOnStartup ?? true
       }
       
-      setGames(loadedGames)
+      setGames(gamesWithFavorites)
       setSettings(settingsWithDefaults)
 
-      if (settingsWithDefaults.scanOnStartup && loadedGames.length === 0) {
+      if (settingsWithDefaults.scanOnStartup) {
         await scanForGames()
       }
     } catch (error) {
@@ -189,14 +197,17 @@ function App() {
   }
 
   const handleToggleFavorite = async (gameId: string) => {
-    const updatedGames = games.map(g => {
-      if (g.id === gameId) {
-        return { ...g, isFavorite: !g.isFavorite }
-      }
-      return g
-    })
-    setGames(updatedGames)
-    await window.electronAPI.saveGames(updatedGames)
+    try {
+      const newFavorites = await window.electronAPI.toggleFavorite(gameId)
+      const favoriteSet = new Set(newFavorites)
+      const updatedGames = games.map(g => ({
+        ...g,
+        isFavorite: favoriteSet.has(g.id)
+      }))
+      setGames(updatedGames)
+    } catch (error) {
+      console.error('Error toggling favorite:', error)
+    }
   }
 
   const handleSaveSettings = async (newSettings: Settings) => {
