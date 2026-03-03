@@ -39,6 +39,9 @@ interface Window {
     saveGameCover: (gameId: string, imagePath: string) => Promise<string>
     getSettings: () => Promise<import('./types').Settings>
     saveSettings: (settings: import('./types').Settings) => Promise<boolean>
+    getFavorites: () => Promise<string[]>
+    saveFavorites: (favoriteIds: string[]) => Promise<boolean>
+    toggleFavorite: (gameId: string) => Promise<string[]>
     windowMinimize: () => Promise<void>
     windowMaximize: () => Promise<void>
     windowClose: () => Promise<void>

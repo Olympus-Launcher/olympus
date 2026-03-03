@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { project, ThemeMode, themes } from '../config'
+import logoUrl from '../assets/logo.png'
 
 interface TitleBarProps {
   theme: ThemeMode
@@ -42,7 +43,7 @@ export default function TitleBar({ theme }: TitleBarProps) {
       } as React.CSSProperties}
     >
       <div className="flex items-center gap-2 px-4">
-        <img src="/logo.png" alt="Logo" className="w-5 h-5 object-contain" draggable="false" />
+        <img src={logoUrl} alt="Logo" className="w-5 h-5 object-contain" draggable="false" />
         <span className="text-sm font-medium" style={{ color: themeColors.text }}>{project.name}</span>
       </div>
 

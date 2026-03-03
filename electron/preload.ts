@@ -23,6 +23,7 @@ export interface Settings {
 export interface ScanResult {
   games: GameInfo[]
   newCount: number
+  removedCount: number
 }
 
 export interface UpdateInfo {
@@ -56,6 +57,9 @@ const electronAPI = {
   saveGameCover: (gameId: string, imagePath: string): Promise<string> => ipcRenderer.invoke('save-game-cover', gameId, imagePath),
   getSettings: (): Promise<Settings> => ipcRenderer.invoke('get-settings'),
   saveSettings: (settings: Settings): Promise<boolean> => ipcRenderer.invoke('save-settings', settings),
+  getFavorites: (): Promise<string[]> => ipcRenderer.invoke('get-favorites'),
+  saveFavorites: (favoriteIds: string[]): Promise<boolean> => ipcRenderer.invoke('save-favorites', favoriteIds),
+  toggleFavorite: (gameId: string): Promise<string[]> => ipcRenderer.invoke('toggle-favorite', gameId),
   windowMinimize: (): Promise<void> => ipcRenderer.invoke('window-minimize'),
   windowMaximize: (): Promise<void> => ipcRenderer.invoke('window-maximize'),
   windowClose: (): Promise<void> => ipcRenderer.invoke('window-close'),
