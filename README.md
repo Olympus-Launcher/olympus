@@ -1,81 +1,116 @@
-# Olympus Frontend
+<!-- HERO SECTION -->
 
-As the Greek gods lived on Mount Olympus, so shall your games. Olympus Frontend is a modern PC game launcher that brings all your games together in one beautiful, centralized hub.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/miguel-apereira/Olympus-Frontend/refs/heads/main/public/logo-big.png" alt="Olympus Frontend Logo" width="250"/>
+</p>
 
-## Features
+<h1 align="center">Olympus Frontend</h1>
 
-- **Unified Library** - View all your games in one place, regardless of where they're installed.
-- **Automatic Game Detection** - Olympus automatically scans and detects your games from supported game clients and stores.
-- **Custom Games** - Add any game manually that isn't automatically detected.
-- **Favorites & Hiding** - Mark games as favorites or hide ones you don't want to see.
-- **Recently Played** - Quick access to your most recently played games.
-- **Theme Support** - Choose between dark and light themes.
-- **Custom Game Covers** - You can import your favorite game covers, animated or static.
-- **Auto-Updates** - The app automatically checks for and installs updates.
+<p align="center">
+  <em>As the Greek gods lived on Mount Olympus, so shall your games.</em>
+</p>
 
-**Most important of all:**
+<p align="center">
+  A modern PC game launcher that unifies your entire library into one beautiful, centralized hub.
+</p>
 
-- **No account or logins required** - Olympus works only with your already installed games, there is no need to login into your steam/epic/ea/ubisoft account. Your data is in your hands only.
+<br/>
 
-## Supported Platforms
+<!-- BADGES -->
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/miguel-apereira/Olympus-Frontend?style=for-the-badge" />
+  <img src="https://img.shields.io/github/downloads/miguel-apereira/Olympus-Frontend/total?style=for-the-badge&label=Total%20Downloads&color=%239173bd" />
+  <img src="https://img.shields.io/github/stars/miguel-apereira/Olympus-Frontend?style=for-the-badge" />
+</p>
 
-Olympus Frontend currently supports games from Steam and Epic Games Store, with more platforms coming soon!
+<br/>
 
-## Planned Features
-The following features are planned to launch in the future:
+<p align="center">
+  <img 
+    src="https://raw.githubusercontent.com/miguel-apereira/Olympus-Frontend/refs/heads/main/screenshots/animated-covers-preview-2.gif" 
+    alt="Animated Game Covers Preview" 
+    width="65%" 
+  />
+</p>
 
-- Emulation support.
-- More game store support.
-- Optional splash arts.
-- Automatically close game clients, after you close a game.
-- Fullscreen console-like experience.
 
-### Customization
-- Custom Themes.
-- Custom Filters (Tabs).
+<h2>✨ Features</h2>
 
-### External Integrations
-- SteamGridDB Integration.
-- HowLongToBeat Integration.
+<ul>
+  <li><strong>🎮 Unified Library</strong> — View all your games in one place.</li>
+  <li><strong>🔍 Automatic Game Detection</strong> — Detects installed games automatically.</li>
+  <li><strong>➕ Manual Game Support</strong> — Add any standalone game.</li>
+  <li><strong>⭐ Favorites & Hiding</strong> — Fully customizable library.</li>
+  <li><strong>🕒 Recently Played</strong> — Resume instantly.</li>
+  <li><strong>🎨 Light & Dark Themes</strong></li>
+  <li><strong>🖼 Custom Covers (Static & Animated)</strong></li>
+  <li><strong>🔄 Auto Updates</strong></li>
+</ul>
 
-## Getting Started
+<br/>
 
-### Prerequisites
+<h2>🔒 Privacy First</h2>
 
-- Windows 10 or later
-- Node.js 18+ (for development)
+<p>
+  <strong>No accounts. No logins. No tracking.</strong><br/>
+  Olympus works with your locally installed games only.<br/>
+  Your data stays on your machine — always.
+</p>
 
-### Installation
+<br/>
 
-Download the latest installer from the [Releases](https://github.com/miguel-apereira/Olympus-Frontend/releases) page.
+<h2>🕹 Supported Platforms</h2>
 
-### Development
+<ul>
+  <li>Steam</li>
+  <li>Epic Games Store</li>
+</ul>
 
-```bash
-# Install dependencies
-npm install
+<p>More platforms coming soon.</p>
 
-# Run in development mode
-npm run electron:dev
-```
+<br/>
 
-### Building
+<h2>🚀 Planned Features</h2>
 
-```bash
-# Build the app
-npm run build
-```
+<ul>
+  <li>Emulation support</li>
+  <li>More store integrations</li>
+  <li>Optional splash arts</li>
+  <li>Auto-close clients after gameplay</li>
+  <li>Fullscreen console-like mode</li>
+  <li>Custom Themes</li>
+  <li>Custom Filters (Tabs)</li>
+  <li>SteamGridDB Integration</li>
+  <li>HowLongToBeat Integration</li>
+  <li>Localization</li>
+</ul>
 
-The built installer will be in the `release` folder.
+<hr/>
 
-## Tech Stack
+<!-- SCREENSHOT PREVIEW -->
 
-- Electron
-- React
-- TypeScript
-- Tailwind CSS
-- Vite
+<h2 align="center">Screenshots</h2>
 
-## License
+<p align="center">
+  <img 
+    src="https://raw.githubusercontent.com/miguel-apereira/Olympus-Frontend/refs/heads/main/screenshots/screenshot-1.png" 
+    alt="Olympus Preview" 
+    width="85%" 
+  />
+</p>
 
-BSD 3-Clause License
+<p align="center">
+  <img 
+    src="https://raw.githubusercontent.com/miguel-apereira/Olympus-Frontend/refs/heads/main/screenshots/screenshot-2.png" 
+    alt="Olympus Preview" 
+    width="85%" 
+  />
+</p>
+
+<p align="center">
+  <img 
+    src="https://raw.githubusercontent.com/miguel-apereira/Olympus-Frontend/refs/heads/main/screenshots/animated-covers-preview-2.gif" 
+    alt="Animated Game Covers Preview" 
+    width="85%" 
+  />
+</p>
