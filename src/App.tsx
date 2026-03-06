@@ -24,7 +24,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingGame, setEditingGame] = useState<GameInfo | null>(null)
-  const [settings, setSettings] = useState<Settings>({ theme: 'dark', scanOnStartup: true })
+  const [settings, setSettings] = useState<Settings>({ theme: 'dark', scanOnStartup: true, hardwareAcceleration: true })
+  const [storesFound, setStoresFound] = useState<{ steam: boolean; epic: boolean }>({ steam: true, epic: true })
   const [isScanning, setIsScanning] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [scanProgress, setScanProgress] = useState<{ current: number; total: number; currentGame: string; store: string } | null>(null)
@@ -63,14 +64,21 @@ function App() {
   const loadInitialData = async () => {
     try {
       console.log('Loading initial data...')
-      const [loadedGames, loadedSettings, favorites] = await Promise.all([
+      const [loadedGames, loadedSettings, favorites, storePaths] = await Promise.all([
         window.electronAPI.getGames(),
         window.electronAPI.getSettings(),
-        window.electronAPI.getFavorites()
+        window.electronAPI.getFavorites(),
+        window.electronAPI.getStorePaths()
       ])
       console.log('Games loaded:', loadedGames.length)
       console.log('Settings loaded:', loadedSettings)
       console.log('Favorites loaded:', favorites)
+      console.log('Store paths:', storePaths)
+      
+      setStoresFound({
+        steam: !!storePaths.steamPath,
+        epic: !!storePaths.epicPath
+      })
       
       const favoriteSet = new Set(favorites)
       const gamesWithFavorites = loadedGames.map(g => ({
@@ -80,7 +88,8 @@ function App() {
       
       const settingsWithDefaults: Settings = {
         theme: loadedSettings?.theme || 'dark',
-        scanOnStartup: loadedSettings?.scanOnStartup ?? true
+        scanOnStartup: loadedSettings?.scanOnStartup ?? true,
+        hardwareAcceleration: loadedSettings?.hardwareAcceleration ?? true
       }
       
       setGames(gamesWithFavorites)
@@ -289,7 +298,7 @@ function App() {
 
   return (
     <div className="h-screen w-screen flex flex-col" style={appStyle}>
-      <TitleBar theme={settings.theme} />
+      <TitleBar theme={settings.theme} onSettingsClick={() => setCurrentView('settings')} />
       
       {updateStatus && updateStatus.status === 'available' && (
         <div className="bg-primary-600 px-4 py-2 flex items-center justify-between text-white">
@@ -357,6 +366,7 @@ function App() {
             custom: games.filter(g => g.store === 'custom').length
           }}
           theme={settings.theme}
+          storesFound={storesFound}
         />
         
         <main 

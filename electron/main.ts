@@ -8,6 +8,7 @@ import { autoUpdater } from 'electron-updater'
 import { getSteamGames, getSteamLaunchUrl, getSteamInstallPath } from './getSteamGames'
 import { getEpicGames } from './getEpicGames'
 import { isAppRunning } from './gameProcess'
+import { updateStorePaths } from './getStoresPath'
 import { GameInfo, Settings } from './types'
 
 const currentVersion = app.getVersion()
@@ -16,7 +17,23 @@ log.transports.file.level = 'info'
 log.transports.console.level = 'debug'
 log.info('Application starting...')
 
-app.disableHardwareAcceleration()
+const settingsFilePath = path.join(app.getPath('userData'), 'config', 'settings.json')
+let hardwareAccelerationEnabled = true
+
+if (fs.existsSync(settingsFilePath)) {
+  try {
+    const settingsData = JSON.parse(fs.readFileSync(settingsFilePath, 'utf-8'))
+    hardwareAccelerationEnabled = settingsData.settings?.hardwareAcceleration ?? true
+    log.info(`Hardware acceleration setting: ${hardwareAccelerationEnabled}`)
+  } catch (error) {
+    log.error('Error reading settings:', error)
+  }
+}
+
+if (!hardwareAccelerationEnabled) {
+  app.disableHardwareAcceleration()
+  log.info('Hardware acceleration disabled')
+}
 
 process.on('uncaughtException', (error) => {
   log.error('Uncaught Exception:', error)
@@ -39,7 +56,8 @@ const store = new Store({
     favorites: [],
     settings: {
       theme: 'dark',
-      scanOnStartup: true
+      scanOnStartup: true,
+      hardwareAcceleration: true
     }
   }
 })
@@ -92,6 +110,7 @@ function createWindow() {
 
 app.whenReady().then(() => {
   log.info('App ready')
+  updateStorePaths()
   createWindow()
 
   globalShortcut.register('CommandOrControl+Shift+I', () => {
@@ -371,8 +390,24 @@ ipcMain.handle('get-settings', async () => {
   return store.get('settings')
 })
 
-ipcMain.handle('save-settings', async (_, settings: { theme: string; scanOnStartup: boolean }) => {
-  store.set('settings', settings)
+ipcMain.handle('refresh-store-paths', async () => {
+  return await updateStorePaths()
+})
+
+ipcMain.handle('get-store-paths', async () => {
+  const settings = store.get('settings') as { gameClients?: { steam?: string | null; epic?: string | null } }
+  return {
+    steamPath: settings?.gameClients?.steam || null,
+    epicPath: settings?.gameClients?.epic || null
+  }
+})
+
+ipcMain.handle('save-settings', async (_, settings: { theme: string; scanOnStartup: boolean; hardwareAcceleration: boolean }) => {
+  const currentSettings = store.get('settings') as Record<string, unknown>
+  store.set('settings', {
+    ...currentSettings,
+    ...settings
+  })
   return true
 })
 
@@ -415,6 +450,11 @@ ipcMain.handle('window-close', () => {
 
 ipcMain.handle('window-is-maximized', () => {
   return mainWindow?.isMaximized() ?? false
+})
+
+ipcMain.handle('restart-app', () => {
+  app.relaunch()
+  app.exit(0)
 })
 
 autoUpdater.logger = log

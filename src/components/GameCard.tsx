@@ -173,7 +173,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
         <div className="absolute top-2 left-2">
           <span 
             className="px-2 py-1 rounded text-xs font-medium text-white flex items-center gap-1"
-            style={{ backgroundColor: 'transparent' }}
+            style={{ backgroundColor: 'transparent', textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}
           >
             {storeLogos[game.store]}
             {game.store.charAt(0).toUpperCase() + game.store.slice(1)}

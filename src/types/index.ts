@@ -18,6 +18,7 @@ export interface GameInfo {
 export interface Settings {
   theme: ThemeMode
   scanOnStartup: boolean
+  hardwareAcceleration: boolean
 }
 
 export type ViewType = 'all' | 'favorites' | 'recent' | 'steam' | 'epic' | 'custom' | 'settings'
