@@ -120,7 +120,7 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ isOpen, onClose }) => {
             <div className="space-y-6">
               {changelog.map((entry, index) => (
                 <div key={index} className="text-theme-text text-sm leading-relaxed">
-                  <h3 className="font-medium mb-3 text-theme-text">Version {entry.version}</h3>
+                  <h2 className="font-semibold mb-3 text-theme-text text-base">Version {entry.version}</h2>
                    <ul className="space-y-2 ml-4">
                      {entry.changes.map((change, i) => (
                        <li key={i} dangerouslySetInnerHTML={{ __html: `• ${change}` }} />
@@ -129,17 +129,7 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ isOpen, onClose }) => {
                 </div>
               ))}
               
-              <div className="pt-4 border-t border-theme-border">
-                <p className="text-sm text-theme-textSecondary mb-2">
-                  For the complete changelog, visit the official documentation:
-                </p>
-                <button
-                  onClick={() => window.open('https://github.com/miguel-apereira/Olympus-Frontend/wiki/Changelog', '_blank')}
-                  className="text-primary-600 hover:underline text-sm break-all block"
-                >
-                  https://github.com/miguel-apereira/Olympus-Frontend/wiki/Changelog
-                </button>
-              </div>
+              
             </div>
           ) : (
             <div className="text-center py-8">
