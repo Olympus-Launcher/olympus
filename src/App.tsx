@@ -6,6 +6,7 @@ import SettingsView from './components/SettingsView'
 import TitleBar from './components/TitleBar'
 import ScanProgressModal from './components/ScanProgressModal'
 import EditGameModal from './components/EditGameModal'
+import ChangelogModal from './components/ChangelogModal'
 import { GameInfo, ViewType, Settings } from './types'
 import { project, labels, themes } from './config'
 
@@ -30,6 +31,7 @@ function App() {
   const [error, setError] = useState<string | null>(null)
   const [scanProgress, setScanProgress] = useState<{ current: number; total: number; currentGame: string; store: string } | null>(null)
   const [updateStatus, setUpdateStatus] = useState<{ status: string; version?: string; percent?: number; error?: string } | null>(null)
+  const [showChangelog, setShowChangelog] = useState(false)
 
   const themeColors = themes[settings.theme]
 
@@ -324,24 +326,30 @@ function App() {
     <div className="h-screen w-screen flex flex-col" style={appStyle}>
       <TitleBar theme={settings.theme} onSettingsClick={() => setCurrentView('settings')} />
       
-      {updateStatus && updateStatus.status === 'available' && (
-        <div className="bg-primary-600 px-4 py-2 flex items-center justify-between text-white">
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            <span>Update {updateStatus.version} available</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => window.electronAPI.downloadUpdate()}
-              className="px-3 py-1 bg-white text-primary-600 rounded text-sm font-medium hover:bg-gray-100"
-            >
-              Download & Install
-            </button>
-          </div>
-        </div>
-      )}
+       {updateStatus && updateStatus.status === 'available' && (
+         <div className="bg-primary-600 px-4 py-2 flex items-center justify-between text-white">
+           <div className="flex items-center gap-2">
+             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+             </svg>
+             <span>Update {updateStatus.version} available</span>
+           </div>
+           <div className="flex items-center gap-2">
+             <button
+               onClick={() => setShowChangelog(true)}
+               className="px-3 py-1 bg-white bg-opacity-20 text-white rounded text-sm font-medium hover:bg-opacity-30"
+             >
+               What's new
+             </button>
+             <button
+               onClick={() => window.electronAPI.downloadUpdate()}
+               className="px-3 py-1 bg-white text-primary-600 rounded text-sm font-medium hover:bg-gray-100"
+             >
+               Download & Install
+             </button>
+           </div>
+         </div>
+       )}
 
       {updateStatus && updateStatus.status === 'downloading' && (
         <div className="bg-blue-600 px-4 py-2 flex items-center justify-between text-white">
@@ -499,12 +507,18 @@ function App() {
         />
       )}
 
-      <ScanProgressModal
-        isOpen={isScanning}
-        progress={scanProgress}
-      />
-    </div>
-  )
+       <ScanProgressModal
+         isOpen={isScanning}
+         progress={scanProgress}
+       />
+
+       <ChangelogModal
+         isOpen={showChangelog}
+         onClose={() => setShowChangelog(false)}
+         version={updateStatus?.version}
+       />
+     </div>
+   )
 }
 
 export default App

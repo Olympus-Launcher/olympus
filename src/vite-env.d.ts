@@ -55,5 +55,6 @@ interface Window {
     launchStore: (storeName: string) => Promise<{ success: boolean; message?: string }>
     onScanProgress: (callback: (progress: ScanProgress) => void) => () => void
     onUpdateStatus: (callback: (status: UpdateStatus) => void) => () => void
+    fetchChangelog: () => Promise<{ content: string; error?: string }>
   }
 }

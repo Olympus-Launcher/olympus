@@ -585,4 +585,19 @@ ipcMain.handle('install-update', () => {
   autoUpdater.quitAndInstall()
 })
 
+ipcMain.handle('fetch-changelog', async () => {
+  log.info('IPC: fetch-changelog called')
+  try {
+    const response = await fetch('https://raw.githubusercontent.com/wiki/miguel-apereira/Olympus-Frontend/Changelog.md')
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const content = await response.text()
+    return { content, error: undefined }
+  } catch (error) {
+    log.error('Error fetching changelog:', error)
+    return { content: '', error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
 log.info('Main process initialized')
