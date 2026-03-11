@@ -636,6 +636,7 @@ ipcMain.handle('get-steamgriddb-grids', async (_, gameId: number) => {
   }
   try {
     const grids = await getSteamGridDBGrids(gameId)
+    log.info('Returning grids to frontend, count:', grids.length, 'first thumb:', grids[0]?.thumb)
     return { grids, error: undefined }
   } catch (error) {
     log.error('Error getting SteamGridDB grids:', error)

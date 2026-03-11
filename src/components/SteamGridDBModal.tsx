@@ -89,6 +89,7 @@ export default function SteamGridDBModal({
 
     try {
       const result = await window.electronAPI.getSteamGridDBGrids(game.id)
+      console.log('Frontend received grids:', result.grids)
       
       if (result.error) {
         setError(result.error)
@@ -269,6 +270,10 @@ export default function SteamGridDBModal({
                       alt={`Cover ${grid.id}`}
                       className="w-full aspect-[3/4] object-cover"
                       loading="lazy"
+                      onError={(e) => {
+                        console.log('Image failed to load:', grid.thumb)
+                        e.currentTarget.src = grid.url
+                      }}
                     />
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center">
                       <span className="text-white text-sm font-medium">

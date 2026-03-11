@@ -47,16 +47,22 @@ export async function getSteamGridDBGrids(gameId: number): Promise<SteamGridDBGr
 
   try {
     const grids = await client.getGrids({ type: 'game', id: gameId })
-    return grids
-      .map((g) => ({
+    log.info('Raw grids count:', grids.length)
+    
+    const mapped = (grids as unknown as any[]).map((g: any) => {
+      const url = typeof g.url === 'string' ? g.url : String(g.url || '')
+      const thumb = typeof g.thumb === 'string' ? g.thumb : String(g.thumb || url)
+      log.info('Mapped grid - thumb:', thumb)
+      return {
         id: g.id,
-        url: g.url,
-        thumb: g.thumb,
-        style: g.style,
-        dimensions: `${g.dimensions?.width || 0}x${g.dimensions?.height || 0}`,
-        likes: g.likes
-      }))
-      .sort((a, b) => b.likes - a.likes)
+        url,
+        thumb,
+        style: g.style || '',
+        dimensions: `${g.width || 0}x${g.height || 0}`,
+        likes: g.score ?? g.upvotes ?? 0
+      }
+    })
+    return mapped.sort((a, b) => b.likes - a.likes)
   } catch (error) {
     log.error('Error getting SteamGridDB grids:', error)
     throw error
@@ -70,17 +76,23 @@ export async function getSteamGridDBGridsBySteamAppId(appId: string): Promise<St
   }
 
   try {
-    const grids = await client.getGridsBySteamAppId(appId)
-    return grids
-      .map((g) => ({
+    const grids = await client.getGridsBySteamAppId(Number(appId))
+    log.info('Raw grids by appid count:', grids.length)
+    
+    const mapped = (grids as unknown as any[]).map((g: any) => {
+      const url = typeof g.url === 'string' ? g.url : String(g.url || '')
+      const thumb = typeof g.thumb === 'string' ? g.thumb : String(g.thumb || url)
+      log.info('Mapped grid by appid - thumb:', thumb)
+      return {
         id: g.id,
-        url: g.url,
-        thumb: g.thumb,
-        style: g.style,
-        dimensions: `${g.dimensions?.width || 0}x${g.dimensions?.height || 0}`,
-        likes: g.likes
-      }))
-      .sort((a, b) => b.likes - a.likes)
+        url,
+        thumb,
+        style: g.style || '',
+        dimensions: `${g.width || 0}x${g.height || 0}`,
+        likes: g.score ?? g.upvotes ?? 0
+      }
+    })
+    return mapped.sort((a, b) => b.likes - a.likes)
   } catch (error) {
     log.error('Error getting SteamGridDB grids by appid:', error)
     throw error

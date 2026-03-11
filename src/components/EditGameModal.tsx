@@ -141,9 +141,10 @@ export default function EditGameModal({ game, theme, onClose, onSave }: EditGame
           {coverImage && (
             <div className="flex justify-center">
               <img 
-                src={`file://${coverImage}`} 
+                src={`file://${coverImage}?t=${Date.now()}`} 
                 alt="Cover preview" 
                 className="h-32 rounded-lg object-cover"
+                key={coverImage}
               />
             </div>
           )}
