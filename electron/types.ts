@@ -17,4 +17,21 @@ export interface Settings {
   theme: string
   scanOnStartup: boolean
   hardwareAcceleration: boolean
+  steamGridDBApiKey?: string
+}
+
+export interface SteamGridDBGame {
+  id: number
+  name: string
+  types: string[]
+  verified: boolean
+}
+
+export interface SteamGridDBGrid {
+  id: number
+  url: string
+  thumb: string
+  style: string
+  dimensions: string
+  likes: number
 }

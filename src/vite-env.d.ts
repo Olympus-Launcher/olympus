@@ -56,5 +56,11 @@ interface Window {
     onScanProgress: (callback: (progress: ScanProgress) => void) => () => void
     onUpdateStatus: (callback: (status: UpdateStatus) => void) => () => void
     fetchChangelog: () => Promise<{ content: string; error?: string }>
+    searchSteamGridDB: (query: string) => Promise<{ games: { id: number; name: string; types: string[]; verified: boolean }[]; error?: string }>
+    getSteamGridDBGrids: (gameId: number) => Promise<{ grids: { id: number; url: string; thumb: string; style: string; dimensions: string; likes: number }[]; error?: string }>
+    getSteamGridDBGridsByAppId: (appId: string) => Promise<{ grids: { id: number; url: string; thumb: string; style: string; dimensions: string; likes: number }[]; error?: string }>
+    downloadSteamGridDBCover: (gridUrl: string, gameId: string) => Promise<{ path: string; error?: string }>
+    initSteamGridDB: (apiKey: string) => Promise<{ success: boolean; error?: string }>
+    checkSteamGridDBStatus: () => Promise<{ initialized: boolean }>
   }
 }

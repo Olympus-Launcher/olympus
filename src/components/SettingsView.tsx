@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { Settings, GameInfo } from '../types'
 import { project, labels, themesList, ThemeMode, themes } from '../config'
 import logoBigUrl from '../assets/logo-big.png'
+import { shell } from 'electron'
 
-type SettingsTab = 'library' | 'appearance' | 'hidden' | 'about'
+type SettingsTab = 'library' | 'appearance' | 'hidden' | 'about' | 'integrations'
 
 interface SettingsViewProps {
   settings: Settings
@@ -81,6 +82,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
 
   const tabs: { id: SettingsTab; label: string }[] = [
     { id: 'library', label: labels.settings.application },
+    { id: 'integrations', label: 'Integrations' },
     { id: 'hidden', label: 'Hidden' },
     { id: 'appearance', label: labels.settings.appearance },
     { id: 'about', label: 'About' }
@@ -203,6 +205,40 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                     </button>
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'integrations' && (
+          <div className="space-y-4">
+            <div className="rounded-xl p-6" style={{ backgroundColor: themeColors.card, border: `1px solid ${themeColors.border}` }}>
+              <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>SteamGridDB</h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <p className="font-medium mb-2" style={{ color: themeColors.text }}>API Key</p>
+                  <p className="text-sm mb-3" style={{ color: themeColors.textSecondary }}>
+                    Required to download game covers. Get your free API key from{' '}
+                    <button
+                      onClick={() => shell.openExternal('https://www.steamgriddb.com/profile/preferences/api')}
+                      className="text-primary-400 hover:text-primary-300 underline"
+                    >
+                      steamgriddb.com
+                    </button>
+                  </p>
+                  <input
+                    type="password"
+                    value={localSettings.steamGridDBApiKey || ''}
+                    onChange={(e) => {
+                      const newSettings = { ...localSettings, steamGridDBApiKey: e.target.value }
+                      setLocalSettings(newSettings)
+                      window.electronAPI.initSteamGridDB(e.target.value)
+                    }}
+                    placeholder="Enter your SteamGridDB API key"
+                    className="w-full px-4 py-2 bg-theme-bg border border-theme-border rounded-lg text-theme-text"
+                  />
+                </div>
               </div>
             </div>
           </div>

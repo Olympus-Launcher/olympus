@@ -502,6 +502,7 @@ function App() {
       {editingGame && (
         <EditGameModal
           game={editingGame}
+          theme={settings.theme}
           onClose={() => setEditingGame(null)}
           onSave={handleEditGame}
         />

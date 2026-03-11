@@ -42,6 +42,22 @@ export interface UpdateStatus {
   error?: string
 }
 
+export interface SteamGridDBGame {
+  id: number
+  name: string
+  types: string[]
+  verified: boolean
+}
+
+export interface SteamGridDBGrid {
+  id: number
+  url: string
+  thumb: string
+  style: string
+  dimensions: string
+  likes: number
+}
+
 interface ElectronAPI {
   getGames: () => Promise<GameInfo[]>
   getAllGames: () => Promise<GameInfo[]>
@@ -74,6 +90,12 @@ interface ElectronAPI {
   onScanProgress: (callback: (progress: { current: number; total: number; currentGame: string; store: string }) => void) => () => void
   onUpdateStatus: (callback: (status: UpdateStatus) => void) => () => void
   fetchChangelog: () => Promise<{ content: string; error?: string }>
+  searchSteamGridDB: (query: string) => Promise<{ games: SteamGridDBGame[]; error?: string }>
+  getSteamGridDBGrids: (gameId: number) => Promise<{ grids: SteamGridDBGrid[]; error?: string }>
+  getSteamGridDBGridsByAppId: (appId: string) => Promise<{ grids: SteamGridDBGrid[]; error?: string }>
+  downloadSteamGridDBCover: (gridUrl: string, gameId: string) => Promise<{ path: string; error?: string }>
+  initSteamGridDB: (apiKey: string) => Promise<{ success: boolean; error?: string }>
+  checkSteamGridDBStatus: () => Promise<{ initialized: boolean }>
 }
 
 const electronAPI: ElectronAPI = {
@@ -115,7 +137,13 @@ const electronAPI: ElectronAPI = {
     ipcRenderer.on('update-status', handler)
     return () => ipcRenderer.removeListener('update-status', handler)
   },
-  fetchChangelog: (): Promise<{ content: string; error?: string }> => ipcRenderer.invoke('fetch-changelog')
+  fetchChangelog: (): Promise<{ content: string; error?: string }> => ipcRenderer.invoke('fetch-changelog'),
+  searchSteamGridDB: (query: string): Promise<{ games: SteamGridDBGame[]; error?: string }> => ipcRenderer.invoke('search-steamgriddb', query),
+  getSteamGridDBGrids: (gameId: number): Promise<{ grids: SteamGridDBGrid[]; error?: string }> => ipcRenderer.invoke('get-steamgriddb-grids', gameId),
+  getSteamGridDBGridsByAppId: (appId: string): Promise<{ grids: SteamGridDBGrid[]; error?: string }> => ipcRenderer.invoke('get-steamgriddb-grids-by-appid', appId),
+  downloadSteamGridDBCover: (gridUrl: string, gameId: string): Promise<{ path: string; error?: string }> => ipcRenderer.invoke('download-steamgriddb-cover', gridUrl, gameId),
+  initSteamGridDB: (apiKey: string): Promise<{ success: boolean; error?: string }> => ipcRenderer.invoke('init-steamgriddb', apiKey),
+  checkSteamGridDBStatus: (): Promise<{ initialized: boolean }> => ipcRenderer.invoke('check-steamgriddb-status')
 }
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI)
