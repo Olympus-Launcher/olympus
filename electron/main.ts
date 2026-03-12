@@ -695,6 +695,21 @@ ipcMain.handle('check-steamgriddb-status', async () => {
   return { initialized: isClientInitialized() }
 })
 
+ipcMain.handle('validate-steamgriddb-key', async () => {
+  log.info('IPC: validate-steamgriddb-key called')
+  try {
+    const isValid = await validateSteamGridDBKey()
+    if (isValid) {
+      return { success: true }
+    } else {
+      return { success: false, error: 'Invalid API key' }
+    }
+  } catch (error: any) {
+    log.error('Error validating SteamGridDB key:', error?.message || error)
+    return { success: false, error: error?.message || 'Failed to validate API key' }
+  }
+})
+
 ipcMain.handle('open-external', async (_, url: string) => {
   log.info('IPC: open-external called', url)
   try {

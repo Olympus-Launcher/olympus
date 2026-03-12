@@ -144,6 +144,7 @@ const electronAPI: ElectronAPI = {
   getSteamGridDBGridsByAppId: (appId: string): Promise<{ grids: SteamGridDBGrid[]; error?: string }> => ipcRenderer.invoke('get-steamgriddb-grids-by-appid', appId),
   downloadSteamGridDBCover: (gridUrl: string, gameId: string): Promise<{ path: string; error?: string }> => ipcRenderer.invoke('download-steamgriddb-cover', gridUrl, gameId),
   initSteamGridDB: (apiKey: string): Promise<{ success: boolean; error?: string }> => ipcRenderer.invoke('init-steamgriddb', apiKey),
+  validateSteamGridDBKey: (): Promise<{ success: boolean; error?: string }> => ipcRenderer.invoke('validate-steamgriddb-key'),
   checkSteamGridDBStatus: (): Promise<{ initialized: boolean }> => ipcRenderer.invoke('check-steamgriddb-status'),
   openExternal: (url: string): Promise<{ success: boolean; error?: string }> => ipcRenderer.invoke('open-external', url)
 }

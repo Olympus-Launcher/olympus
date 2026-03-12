@@ -61,6 +61,7 @@ interface Window {
     getSteamGridDBGridsByAppId: (appId: string) => Promise<{ grids: { id: number; url: string; thumb: string; style: string; dimensions: string; likes: number }[]; error?: string }>
     downloadSteamGridDBCover: (gridUrl: string, gameId: string) => Promise<{ path: string; error?: string }>
     initSteamGridDB: (apiKey: string) => Promise<{ success: boolean; error?: string }>
+    validateSteamGridDBKey: () => Promise<{ success: boolean; error?: string }>
     checkSteamGridDBStatus: () => Promise<{ initialized: boolean }>
     openExternal: (url: string) => Promise<{ success: boolean; error?: string }>
   }

@@ -301,7 +301,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                             const result = await window.electronAPI.initSteamGridDB(localSettings.integrations.steamGridDBApiKey)
                             
                             if (result.success) {
-                              setConnectionTestResult({ success: true, message: 'You API key is valid!' })
+                              setConnectionTestResult({ success: true, message: 'Your API key is valid!' })
                               setApiKeyConfirmed(true)
                               onSave(localSettings)
                             } else {
@@ -313,7 +313,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                           disabled={!localSettings.integrations?.steamGridDBApiKey || isTestingConnection}
                           className="px-4 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-600/50 text-white rounded-lg transition-colors"
                         >
-                          {isTestingConnection ? 'Testing...' : 'Save'}
+                          {isTestingConnection ? 'Testing...' : 'Test Connection'}
                         </button>
                       </div>
                     </>

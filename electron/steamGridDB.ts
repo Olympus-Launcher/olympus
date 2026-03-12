@@ -1,17 +1,21 @@
 import SGDB from 'steamgriddb'
+import axios from 'axios'
 import { promises as fsPromises } from 'fs'
 import path from 'path'
 import log from 'electron-log'
 import { SteamGridDBGame, SteamGridDBGrid } from './types'
 
 let client: SGDB | null = null
+let apiKey: string = ''
 
-export function initSteamGridDB(apiKey: string): void {
-  if (!apiKey) {
+export function initSteamGridDB(key: string): void {
+  if (!key) {
     client = null
+    apiKey = ''
     return
   }
-  client = new SGDB({ key: apiKey })
+  apiKey = key
+  client = new SGDB({ key })
   log.info('SteamGridDB client initialized')
 }
 
@@ -22,7 +26,7 @@ export function isClientInitialized(): boolean {
 export async function searchSteamGridDB(query: string): Promise<SteamGridDBGame[]> {
   if (!client) {
     log.warn('SteamGridDB client not initialized')
-    return []
+    throw new Error('SteamGridDB client not initialized')
   }
 
   try {
@@ -35,34 +39,54 @@ export async function searchSteamGridDB(query: string): Promise<SteamGridDBGame[
     }))
   } catch (error: any) {
     log.error('Error searching SteamGridDB:', JSON.stringify(error))
-    if (error?.response?.status === 401 || error?.response?.status === 403) {
-      throw new Error('INVALID_API_KEY')
-    }
-    const errorMsg = error?.message || String(error)
-    if (errorMsg.includes('401') || errorMsg.includes('403') || errorMsg.includes('Unauthorized') || errorMsg.includes('Forbidden') || errorMsg.toLowerCase().includes('unauthorized')) {
-      throw new Error('INVALID_API_KEY')
-    }
     throw error
   }
 }
 
 export async function validateSteamGridDBKey(): Promise<boolean> {
-  if (!client) {
+  if (!client || !apiKey) {
+    log.warn('validateSteamGridDBKey: No client or key')
     return false
   }
 
   try {
-    await client.getGrids({ type: 'game', id: 2254 })
-    return true
+    log.info('validateSteamGridDBKey: Using direct axios POST to validate...')
+    const response = await axios.post('https://www.steamgriddb.com/api/v2/games/search', 
+      { term: 'test' },
+      { 
+        headers: { 
+          'Authorization': `Bearer ${apiKey}`, 
+          'Content-Type': 'application/json' 
+        },
+        timeout: 10000
+      }
+    )
+    log.info('validateSteamGridDBKey: Got response, status:', response.status)
+    return response.status === 200
   } catch (error: any) {
-    log.error('Validation error:', JSON.stringify(error))
-    if (error?.response?.status === 401 || error?.response?.status === 403) {
-      return false
-    }
+    const status = error?.response?.status
     const errorMsg = error?.message || String(error)
-    if (errorMsg.includes('401') || errorMsg.includes('403') || errorMsg.toLowerCase().includes('unauthorized') || errorMsg.toLowerCase().includes('forbidden')) {
+    let responseData = error?.response?.data
+    if (typeof responseData === 'string') {
+      responseData = responseData.substring(0, 200)
+    }
+    log.error('validateSteamGridDBKey: CAUGHT ERROR:', { status, errorMsg, responseData })
+    
+    // 401 = definitely invalid key
+    if (status === 401 || status === 403) {
+      log.info('validateSteamGridDBKey: Key is definitely invalid (401/403)')
       return false
     }
+    
+    // For any other error (like 404), check if it's an "invalid key" message
+    const respStr = String(responseData || '')
+    if (respStr.toLowerCase().includes('invalid') && respStr.toLowerCase().includes('key')) {
+      log.info('validateSteamGridDBKey: Response indicates invalid key')
+      return false
+    }
+    
+    // Any other error - assume key is valid but endpoint issue
+    log.warn('validateSteamGridDBKey: Non-auth error, assuming key is valid')
     return true
   }
 }
