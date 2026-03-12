@@ -11,6 +11,16 @@ import { getEpicGames } from './getEpicGames'
 import { isAppRunning } from './gameProcess'
 import { updateStorePaths, getEpicInstallPath } from './getStoresPath'
 import { GameInfo, Settings } from './types'
+import { 
+  initSteamGridDB, 
+  searchSteamGridDB, 
+  getSteamGridDBGrids, 
+  getSteamGridDBGridsBySteamAppId,
+  downloadSteamGridDBCover,
+  isExactMatch,
+  isClientInitialized,
+  validateSteamGridDBKey
+} from './steamGridDB'
 
 const currentVersion = app.getVersion()
 
@@ -116,6 +126,12 @@ function createWindow() {
 app.whenReady().then(() => {
   log.info('App ready')
   updateStorePaths()
+  
+  const currentSettings = store.get('settings') as Settings
+  if (currentSettings.integrations?.steamGridDBApiKey) {
+    initSteamGridDB(currentSettings.integrations.steamGridDBApiKey)
+  }
+  
   createWindow()
 
   globalShortcut.register('CommandOrControl+Shift+I', () => {
@@ -597,6 +613,111 @@ ipcMain.handle('fetch-changelog', async () => {
   } catch (error) {
     log.error('Error fetching changelog:', error)
     return { content: '', error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('search-steamgriddb', async (_, query: string) => {
+  log.info('IPC: search-steamgriddb called', query)
+  if (!isClientInitialized()) {
+    return { error: 'SteamGridDB API key not configured. You can set your API key in the settings.' }
+  }
+  try {
+    const games = await searchSteamGridDB(query)
+    return { games, error: undefined }
+  } catch (error) {
+    log.error('Error searching SteamGridDB:', error)
+    return { games: [], error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('get-steamgriddb-grids', async (_, gameId: number) => {
+  log.info('IPC: get-steamgriddb-grids called', gameId)
+  if (!isClientInitialized()) {
+    return { grids: [], error: 'SteamGridDB API key not configured' }
+  }
+  try {
+    const grids = await getSteamGridDBGrids(gameId)
+    log.info('Returning grids to frontend, count:', grids.length, 'first thumb:', grids[0]?.thumb)
+    return { grids, error: undefined }
+  } catch (error) {
+    log.error('Error getting SteamGridDB grids:', error)
+    return { grids: [], error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('get-steamgriddb-grids-by-appid', async (_, appId: string) => {
+  log.info('IPC: get-steamgriddb-grids-by-appid called', appId)
+  if (!isClientInitialized()) {
+    return { grids: [], error: 'SteamGridDB API key not configured' }
+  }
+  try {
+    const grids = await getSteamGridDBGridsBySteamAppId(appId)
+    return { grids, error: undefined }
+  } catch (error) {
+    log.error('Error getting SteamGridDB grids by appid:', error)
+    return { grids: [], error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('download-steamgriddb-cover', async (_, gridUrl: string, gameId: string) => {
+  log.info('IPC: download-steamgriddb-cover called', gameId)
+  try {
+    const coverPath = await downloadSteamGridDBCover(gridUrl, gameId, app.getPath('userData'))
+    return { path: coverPath, error: undefined }
+  } catch (error) {
+    log.error('Error downloading SteamGridDB cover:', error)
+    return { path: '', error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('init-steamgriddb', async (_, apiKey: string) => {
+  log.info('IPC: init-steamgriddb called')
+  try {
+    initSteamGridDB(apiKey)
+    
+    const isValid = await validateSteamGridDBKey()
+    if (!isValid) {
+      return { success: false, error: 'Invalid API key' }
+    }
+    
+    return { success: true }
+  } catch (error: any) {
+    log.error('Error initializing SteamGridDB:', error?.message || error)
+    initSteamGridDB('')
+    if (error?.message === 'INVALID_API_KEY' || error?.message?.includes('401') || error?.message?.includes('403') || error?.message?.includes('Unauthorized') || error?.message?.includes('Forbidden')) {
+      return { success: false, error: 'Invalid API key' }
+    }
+    return { success: false, error: error.message || 'Failed to validate API key' }
+  }
+})
+
+ipcMain.handle('check-steamgriddb-status', async () => {
+  return { initialized: isClientInitialized() }
+})
+
+ipcMain.handle('validate-steamgriddb-key', async () => {
+  log.info('IPC: validate-steamgriddb-key called')
+  try {
+    const isValid = await validateSteamGridDBKey()
+    if (isValid) {
+      return { success: true }
+    } else {
+      return { success: false, error: 'Invalid API key' }
+    }
+  } catch (error: any) {
+    log.error('Error validating SteamGridDB key:', error?.message || error)
+    return { success: false, error: error?.message || 'Failed to validate API key' }
+  }
+})
+
+ipcMain.handle('open-external', async (_, url: string) => {
+  log.info('IPC: open-external called', url)
+  try {
+    await shell.openExternal(url)
+    return { success: true }
+  } catch (error) {
+    log.error('Error opening external URL:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
   }
 })
 

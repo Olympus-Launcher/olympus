@@ -1,6 +1,6 @@
 {
   "name": "olympus-frontend",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Modern PC Game Launcher",
   "main": "dist-electron/main.js",
   "author": "Salierus",
@@ -16,12 +16,15 @@
     "electron-log": "^5.0.0",
     "electron-store": "^8.1.0",
     "electron-updater": "^6.8.3",
+    "node-fetch": "^2.6.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "steamgriddb": "^2.2.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "@types/node-fetch": "^2.6.2",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@types/uuid": "^9.0.0",
@@ -40,7 +43,7 @@
   },
   "build": {
     "appId": "com.olympusfrontend.app",
-    "productName": "Olympus Game Launcher",
+    "productName": "Olympus",
     "icon": "favicon.ico",
     "directories": {
       "output": "release"
@@ -58,7 +61,7 @@
           ]
         }
       ],
-      "artifactName": "OlympusFrontend-Setup-${version}.${ext}"
+      "artifactName": "Olympus-Setup-${version}.${ext}"
     },
     "nsis": {
       "oneClick": false,

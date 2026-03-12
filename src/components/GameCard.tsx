@@ -53,7 +53,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
       >
         <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 placeholder-icon" style={{ backgroundColor: themeColors.surface }}>
           {game.coverImage ? (
-            <img src={`file://${game.coverImage}`} alt={game.name} className="w-full h-full object-cover" />
+            <img src={`file://${game.coverImage}?t=${Date.now()}`} alt={game.name} className="w-full h-full object-cover" key={`${game.id}-${game.coverImage}`} />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-2xl font-bold" style={{ color: themeColors.textSecondary }}>
               {(game.name || '?').charAt(0).toUpperCase()}
@@ -143,9 +143,10 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
       <div className="aspect-[2/3] relative">
         {game.coverImage ? (
           <img 
-            src={`file://${game.coverImage}`} 
+            src={`file://${game.coverImage}?t=${Date.now()}`} 
             alt={game.name} 
             className="w-full h-full object-cover"
+            key={`${game.id}-${game.coverImage}`}
           />
         ) : (
           <div className="w-full h-full placeholder-icon flex items-center justify-center" style={{ backgroundColor: themeColors.surface }}>

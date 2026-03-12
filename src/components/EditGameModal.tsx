@@ -1,19 +1,26 @@
 import { useState } from 'react'
 import { GameInfo } from '../types'
-import { project, labels } from '../config'
+import { project, labels, ThemeMode } from '../config'
+import SteamGridDBModal from './SteamGridDBModal'
 
 interface EditGameModalProps {
   game: GameInfo
+  theme: ThemeMode
   onClose: () => void
   onSave: (game: GameInfo) => void
 }
 
-export default function EditGameModal({ game, onClose, onSave }: EditGameModalProps) {
+export default function EditGameModal({ game, theme, onClose, onSave }: EditGameModalProps) {
   const [name, setName] = useState(game.name)
   const [executablePath, setExecutablePath] = useState(game.executablePath)
   const [coverImage, setCoverImage] = useState(game.coverImage || '')
   const [store, setStore] = useState(game.store)
   const [isLoading, setIsLoading] = useState(false)
+  const [showSteamGridDB, setShowSteamGridDB] = useState(false)
+
+  const handleCoverSelected = (coverPath: string) => {
+    setCoverImage(coverPath)
+  }
 
   const handleSelectExecutable = async () => {
     const path = await window.electronAPI.selectExecutable()
@@ -51,7 +58,7 @@ export default function EditGameModal({ game, onClose, onSave }: EditGameModalPr
 
   return (
     <div className="fixed inset-0 bg-black/70 modal-overlay flex items-center justify-center z-50">
-      <div className="bg-theme-surface border border-theme-border rounded-2xl w-full max-w-md mx-4 overflow-hidden fade-in">
+      <div className="bg-theme-surface border border-theme-border rounded-2xl w-full max-w-xl mx-4 overflow-hidden fade-in">
         <div className="flex items-center justify-between px-6 py-4 border-b border-theme-border">
           <h2 className="text-lg font-semibold text-theme-text">Edit Game</h2>
           <button
@@ -118,15 +125,24 @@ export default function EditGameModal({ game, onClose, onSave }: EditGameModalPr
               >
                 {labels.addGame.browse}
               </button>
+              <button
+                type="button"
+                onClick={() => setShowSteamGridDB(true)}
+                className="px-4 py-2 bg-[#1b2838] border border-[#66c0f4]/30 rounded-lg text-[#66c0f4] hover:bg-[#1b2838]/80 transition-colors"
+                title="Download from SteamGridDB"
+              >
+                SteamGridDB
+              </button>
             </div>
           </div>
 
           {coverImage && (
             <div className="flex justify-center">
               <img 
-                src={`file://${coverImage}`} 
+                src={`file://${coverImage}?t=${Date.now()}`} 
                 alt="Cover preview" 
                 className="h-32 rounded-lg object-cover"
+                key={coverImage}
               />
             </div>
           )}
@@ -171,6 +187,17 @@ export default function EditGameModal({ game, onClose, onSave }: EditGameModalPr
           </div>
         </form>
       </div>
+
+      {showSteamGridDB && (
+        <SteamGridDBModal
+          gameName={name}
+          gameId={game.id}
+          steamAppId={game.appid}
+          theme={theme}
+          onClose={() => setShowSteamGridDB(false)}
+          onCoverSelected={handleCoverSelected}
+        />
+      )}
     </div>
   )
 }
