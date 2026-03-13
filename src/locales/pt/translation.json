@@ -59,7 +59,7 @@
   "addGame": {
     "title": "Adicionar Jogo",
     "gameName": "Nome do Jogo",
-    "gameNamePlaceholder": "Nme do jogo",
+    "gameNamePlaceholder": "Nome do jogo",
     "executablePath": "Caminho do Executável (.exe)",
     "executablePathPlaceholder": "C:\\Games\\game.exe",
     "coverImage": "Imagem de Capa (opcional mas recomendado)",

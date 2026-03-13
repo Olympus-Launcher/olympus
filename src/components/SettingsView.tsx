@@ -295,7 +295,9 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                   <button
                     onClick={() => {
                       const newValue = !localSettings.hardwareAcceleration
-                      setLocalSettings({ ...localSettings, hardwareAcceleration: newValue })
+                      const newSettings = { ...localSettings, hardwareAcceleration: newValue }
+                      setLocalSettings(newSettings)
+                      onSave(newSettings)
                       setShowRestartMessage(true)
                     }}
                     className={`relative inline-flex w-11 h-6 flex-shrink-0 rounded-full transition-colors cursor-pointer ${

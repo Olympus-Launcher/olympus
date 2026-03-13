@@ -28,32 +28,6 @@ log.transports.file.level = 'info'
 log.transports.console.level = 'debug'
 log.info('Application starting...')
 
-const settingsFilePath = path.join(app.getPath('userData'), 'config', 'settings.json')
-let hardwareAccelerationEnabled = true
-
-if (fs.existsSync(settingsFilePath)) {
-  try {
-    const settingsData = JSON.parse(fs.readFileSync(settingsFilePath, 'utf-8'))
-    hardwareAccelerationEnabled = settingsData.settings?.hardwareAcceleration ?? true
-    log.info(`Hardware acceleration setting: ${hardwareAccelerationEnabled}`)
-  } catch (error) {
-    log.error('Error reading settings:', error)
-  }
-}
-
-if (!hardwareAccelerationEnabled) {
-  app.disableHardwareAcceleration()
-  log.info('Hardware acceleration disabled')
-}
-
-process.on('uncaughtException', (error) => {
-  log.error('Uncaught Exception:', error)
-})
-
-process.on('unhandledRejection', (reason) => {
-  log.error('Unhandled Rejection:', reason)
-})
-
 const configDir = path.join(app.getPath('userData'), 'config')
 if (!fs.existsSync(configDir)) {
   fs.mkdirSync(configDir, { recursive: true })
@@ -71,6 +45,23 @@ const store = new Store({
       hardwareAcceleration: true
     }
   }
+})
+
+const startupSettings = store.get('settings') as Settings
+let hardwareAccelerationEnabled = startupSettings?.hardwareAcceleration ?? true
+log.info(`Hardware acceleration setting: ${hardwareAccelerationEnabled}`)
+
+if (!hardwareAccelerationEnabled) {
+  app.disableHardwareAcceleration()
+  log.info('Hardware acceleration disabled')
+}
+
+process.on('uncaughtException', (error) => {
+  log.error('Uncaught Exception:', error)
+})
+
+process.on('unhandledRejection', (reason) => {
+  log.error('Unhandled Rejection:', reason)
 })
 
 let mainWindow: BrowserWindow | null = null
@@ -463,7 +454,7 @@ ipcMain.handle('get-store-paths', async () => {
   }
 })
 
-ipcMain.handle('save-settings', async (_, settings: { theme: string; scanOnStartup: boolean; hardwareAcceleration: boolean }) => {
+ipcMain.handle('save-settings', async (_, settings: Settings) => {
   const currentSettings = store.get('settings') as Record<string, unknown>
   store.set('settings', {
     ...currentSettings,
