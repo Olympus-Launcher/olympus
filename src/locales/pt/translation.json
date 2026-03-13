@@ -3,56 +3,56 @@
   "app": {
 
     "header": {
-      "games": "games",
-      "game": "game"
+      "games": "jogos",
+      "game": "jogo"
     },
     
     "search": {
-      "placeholder": "Search games..."
+      "placeholder": "Procurar jogo..."
     },
 
-    "loading": "Loading...",
+    "loading": "A carregar...",
     "version": "v",
     "description": "Let your games reside in Mount Olympus and launch them from there.",
-    "steamGamesTitle": "Steam Library",
-    "epicGamesTitle": "Epic Games Library",
-    "customGamesTitle": "Custom Games",
-    "addGameButton": "Add Game"
+    "steamGamesTitle": "Biblioteca Steam",
+    "epicGamesTitle": "Biblioteca Epic Games",
+    "customGamesTitle": "Jogos adicionados por ti",
+    "addGameButton": "Adicionar Jogo"
   },
 
   "sidebar": {
-    "allGames": "All Games",
-    "favorites": "Favorites",
-    "recentlyPlayed": "Recently Played",
-    "settings": "Settings",
-    "yourGames": "Your PC Games"
+    "allGames": "Todos os Jogos",
+    "favorites": "Favoritos",
+    "recentlyPlayed": "Jogado Recentemente",
+    "settings": "Definições",
+    "yourGames": "Os Teus Jogos"
   },
 
   "gameGrid": {
-    "noGamesFound": "No Games Found",
-    "noGamesDescription": "Start by scanning for installed games or manually add a game to your library.",
-    "scanForGames": "Scan for Games",
-    "scanning": "Scanning...",
-    "gridView": "Grid View",
-    "listView": "List View",
-    "scanningForGames": "Scanning for games..."
+    "noGamesFound": "Nenhum Jogo Encontrado",
+    "noGamesDescription": "Começa por procurar jogos instalados ou adicionar um jogo manualmente.",
+    "scanForGames": "Procurar Jogos",
+    "scanning": "A procurar...",
+    "gridView": "Vista em Grelha",
+    "listView": "Vista em Lista",
+    "scanningForGames": "A procurar jogos..."
   },
 
   "gameCard": {
-    "play": "Play",
-    "favorite": "Favorite",
-    "addToFavorites": "Add to Favorites",
-    "removeFromFavorites": "Remove from Favorites",
-    "neverPlayed": "Never played",
-    "playedToday": "Played today",
-    "playedYesterday": "Played yesterday",
-    "playedDaysAgo": "Played {{days}} days ago",
-    "playedWeeksAgo": "Played {{weeks}} weeks ago",
-    "playedMonthsAgo": "Played {{months}} months ago",
-    "context_menu_edit": "Edit",
-    "context_menu_hide": "Hide",
-    "context_menu_remove": "Remove",
-    "unhide": "Unhide"
+    "play": "Jogar",
+    "favorite": "Favorito",
+    "addToFavorites": "Adicionar aos Favoritos",
+    "removeFromFavorites": "Remover dos Favoritos",
+    "neverPlayed": "Nunca jogado",
+    "playedToday": "Jogado hoje",
+    "playedYesterday": "Jogado ontem",
+    "playedDaysAgo": "Jogado há {{days}} dias",
+    "playedWeeksAgo": "Jogado há {{weeks}} semanas",
+    "playedMonthsAgo": "Jogado há {{months}} meses",
+    "context_menu_edit": "Editar",
+    "context_menu_hide": "Ocultar",
+    "context_menu_remove": "Remover",
+    "unhide": "Mostrar"
   },
 
   "addGame": {

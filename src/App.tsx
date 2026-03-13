@@ -431,9 +431,9 @@ function App() {
                     {currentView === 'all' && t('sidebar.allGames')}
                     {currentView === 'favorites' && t('sidebar.favorites')}
                     {currentView === 'recent' && t('sidebar.recentlyPlayed')}
-                    {currentView === 'steam' && project.supportedStoreNames.steam + ' ' + t('app.steamGamesTitle')}
-                    {currentView === 'epic' && project.supportedStoreNames.epic + ' ' + t('app.epicGamesTitle')}
-                    {currentView === 'custom' && project.supportedStoreNames.custom + ' ' + t('app.customGamesTitle')}
+                    {currentView === 'steam' && t('app.steamGamesTitle')}
+                    {currentView === 'epic' && t('app.epicGamesTitle')}
+                    {currentView === 'custom' && t('app.customGamesTitle')}
                   </h1>
                   <p className="text-sm mt-1" style={{ color: themeColors.textSecondary }}>
                     {filteredGames.length} {filteredGames.length === 1 ? t('app.header.game') : t('app.header.games')}
