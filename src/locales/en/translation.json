@@ -1,9 +1,23 @@
 {
 
   "app": {
+
+    "header": {
+      "games": "games",
+      "game": "game"
+    },
+    
+    "search": {
+      "placeholder": "Search games..."
+    },
+
     "loading": "Loading...",
     "version": "v",
-    "description": "Let your games reside in Mount Olympus and launch them from there."
+    "description": "Let your games reside in Mount Olympus and launch them from there.",
+    "steamGamesTitle": "Library",
+    "epicGamesTitle": "Library",
+    "customGamesTitle": "Games",
+    "addGameButton": "Add Game"
   },
 
   "sidebar": {
@@ -70,6 +84,7 @@
 
   "settings": {
     "title": "Settings",
+
     "tabs": {
       "application": {
         "tabLabel": "Application",
@@ -87,12 +102,14 @@
         "darkMode": "Dark",
         "lightMode": "Light"
       },
+
       "hidden_games": {
         "tabLabel": "Hidden Games",
         "hidden_games": "Hidden Games",
         "noHiddenGames": "You have not hidden any games yet.",
         "unhide": "Unhide"
       },
+
       "integrations": {
         "tabLabel": "Integrations",
         "steamGridDB": "SteamGridDB",
@@ -109,6 +126,7 @@
         "apiKeyConfigured": "Your API Key is valid and configured!",
         "removeApiKey": "Remove API Key"
       },
+
       "about": {
         "tabLabel": "About",
         "about": "About",
@@ -117,32 +135,13 @@
         "aboutText2": "You can always send us your feedback!",
         "withLove": "From Portugal with ❤️",
         "update": "Check for Updates",
-        "checkingUpdates": "Checking for updates...",
-        "updateAvailable": "Update {{version}} is available!",
-        "updateAvailableButton": "Download & Install",
-        "downloadingUpdate": "Downloading update... {{percent}}%",
-        "updateReadyToInstall": "Update {{version}} is ready to install.",
-        "updateReadyToInstallButton": "Restart & Install",
-        "latestVersion": "You're running the latest version!",
-        "updateTryAgain": "Try Again",
         "checkUpdatesButton": "Check for Updates",
         "error": "Error"
       }
     },
     
-    "about": "About",
-    "version": "Version",
     "restartToApply": "Restart required for changes to take effect!",
     "restartNow": "Restart Now"
-  },
-
-  "search": {
-    "placeholder": "Search games..."
-  },
-
-  "header": {
-    "games": "games",
-    "game": "game"
   },
 
   "steamGridDB": {
@@ -173,6 +172,18 @@
     "viewOnline": "View changelog online",
     "version": "Version {{version}}",
     "noChanges": "No changelog entries found."
+  },
+
+  "update": {
+    "checkingUpdates": "Checking for updates...",
+    "updateAvailable": "Update {{version}} is available!",
+    "updateAvailableButton": "Download & Install",
+    "downloadingUpdate": "Downloading update... {{percent}}",
+    "updateReadyToInstall": "Update {{version}} is ready to install.",
+    "updateReadyToInstallButton": "Restart & Install",
+    "latestVersion": "You're running the latest version!",
+    "updateTryAgain": "Try Again",
+    "changelogButton": "What's new"
   }
 
 }

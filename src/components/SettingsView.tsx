@@ -415,7 +415,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                 {updateStatus?.status === 'checking' || isCheckingUpdate ? (
                   <div className="flex items-center gap-3" style={{ color: themeColors.textSecondary }}>
                     <div className="w-5 h-5 border-2 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
-                    <span>{t('settings.tabs.about.checkingUpdates')}</span>
+                    <span>{t('update.checkingUpdates')}</span>
                   </div>
                 ) : updateStatus?.status === 'available' ? (
                   <div className="space-y-3">
@@ -423,7 +423,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                       <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
-                      <span>{t('settings.tabs.about.updateAvailable', { version: updateStatus.version })}</span>
+                      <span>{t('update.updateAvailable', { version: updateStatus.version })}</span>
                     </div>
                     <button
                       onClick={handleDownloadUpdate}
@@ -432,14 +432,14 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
-                      {t('settings.tabs.about.updateAvailableButton')}
+                      {t('update.updateAvailableButton')}
                     </button>
                   </div>
                 ) : updateStatus?.status === 'downloading' ? (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2" style={{ color: themeColors.textSecondary }}>
                       <div className="w-5 h-5 border-2 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
-                      <span>{t('settings.tabs.about.downloadingUpdate', { percent: Math.round(updateStatus.percent || 0) })}</span>
+                      <span>{t('update.downloadingUpdate', { percent: Math.round(updateStatus.percent || 0) })}%</span>
                     </div>
                     <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: themeColors.border }}>
                       <div 
@@ -454,7 +454,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                       <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span>{t('settings.tabs.about.updateReadyToInstall', { version: updateStatus.version })}</span>
+                      <span>{t('update.updateReadyToInstall', { version: updateStatus.version })}</span>
                     </div>
                     <button
                       onClick={handleInstallUpdate}
@@ -463,7 +463,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                       </svg>
-                      {t('settings.tabs.about.updateReadyToInstallButton')}
+                      {t('update.updateReadyToInstallButton')}
                     </button>
                   </div>
                 ) : updateStatus?.status === 'not-available' ? (
@@ -471,7 +471,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span>{t('settings.tabs.about.latestVersion')}</span>
+                    <span>{t('update.latestVersion')}</span>
                   </div>
                 ) : updateStatus?.status === 'error' ? (
                   <div className="space-y-3">
@@ -485,7 +485,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                       onClick={handleCheckForUpdates}
                       className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
                     >
-                      {t('settings.tabs.about.updateTryAgain')}
+                      {t('update.updateTryAgain')}
                     </button>
                   </div>
                 ) : (
