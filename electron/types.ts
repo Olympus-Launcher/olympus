@@ -17,6 +17,7 @@ export interface Settings {
   theme: string
   scanOnStartup: boolean
   hardwareAcceleration: boolean
+  language?: string
   integrations?: {
     steamGridDBApiKey?: string
   }

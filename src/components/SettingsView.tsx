@@ -137,10 +137,16 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                       setLocalSettings(newSettings)
                       onSave(newSettings)
                     }}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${localSettings.scanOnStartup ? 'bg-primary-600' : 'bg-gray-600'}`}
+                    className={`relative inline-flex w-11 h-6 flex-shrink-0 rounded-full transition-colors cursor-pointer ${
+                      localSettings.scanOnStartup ? 'bg-primary-600' : ''
+                    }`}
+                    style={{ backgroundColor: localSettings.scanOnStartup ? undefined : themeColors.border }}
+                    type="button"
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${localSettings.scanOnStartup ? 'translate-x-6' : 'translate-x-1'}`}
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
+                        localSettings.scanOnStartup ? 'translate-x-5' : 'translate-x-0'
+                      }`}
                     />
                   </button>
                 </div>
@@ -281,8 +287,8 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
               <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>{t('settings.tabs.application.application')}</h2>
               
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex-1 min-w-0">
                     <p className="font-medium" style={{ color: themeColors.text }}>{t('settings.tabs.application.hardwareAcceleration')}</p>
                     <p className="text-sm" style={{ color: themeColors.textSecondary }}>{t('settings.tabs.application.hardwareAccelerationDescription')}</p>
                   </div>
@@ -292,14 +298,15 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                       setLocalSettings({ ...localSettings, hardwareAcceleration: newValue })
                       setShowRestartMessage(true)
                     }}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
+                    className={`relative inline-flex w-11 h-6 flex-shrink-0 rounded-full transition-colors cursor-pointer ${
                       localSettings.hardwareAcceleration ? 'bg-primary-600' : ''
                     }`}
                     style={{ backgroundColor: localSettings.hardwareAcceleration ? undefined : themeColors.border }}
+                    type="button"
                   >
                     <span 
-                      className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                        localSettings.hardwareAcceleration ? 'left-7' : 'left-1'
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
+                        localSettings.hardwareAcceleration ? 'translate-x-5' : 'translate-x-0'
                       }`}
                     />
                   </button>
