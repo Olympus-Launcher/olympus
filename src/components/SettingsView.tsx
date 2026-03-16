@@ -478,7 +478,8 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
 
             <div className="rounded-xl p-6" style={{ backgroundColor: themeColors.card, border: `1px solid ${themeColors.border}` }}>
               <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>{t('settings.tabs.about.update')}</h2>
-
+              <p style={{ color: themeColors.textSecondary }}>{t('settings.tabs.about.updateAreaDescription')}</p>
+              <br></br>
               <div className="space-y-4">
                 {updateStatus?.status === 'checking' || isCheckingUpdate ? (
                   <div className="flex items-center gap-3" style={{ color: themeColors.textSecondary }}>
