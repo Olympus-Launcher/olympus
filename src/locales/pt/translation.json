@@ -104,6 +104,8 @@
         "appearance": "Aparência",
         "theme": "Tema",
         "themeDescription": "Escolhe o tema que preferires para a aplicação.",
+        "showStoreOnGameCard": "Mostrar Nome da Loja",
+        "showStoreOnGameCardDescription": "Mostrar o nome da loja (Steam, Epic, Personalizado) nos cartões de jogos",
         "darkMode": "Escuro",
         "lightMode": "Claro",
         "language": "Língua",

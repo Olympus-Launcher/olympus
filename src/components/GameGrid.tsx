@@ -17,6 +17,7 @@ interface GameGridProps {
   isScanning: boolean
   onScan: () => void
   themeColors: ThemeColors
+  showStoreOnGameCard: boolean
 }
 
 export default function GameGrid({ 
@@ -30,7 +31,8 @@ export default function GameGrid({
   isEmpty,
   isScanning,
   onScan,
-  themeColors
+  themeColors,
+  showStoreOnGameCard
 }: GameGridProps) {
   const { t } = useTranslation()
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -136,6 +138,7 @@ export default function GameGrid({
             onToggleFavorite={onToggleFavorite}
             onEdit={onEdit}
             themeColors={themeColors}
+            showStoreOnGameCard={showStoreOnGameCard}
           />
         ))}
       </div>

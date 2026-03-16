@@ -104,6 +104,8 @@
         "appearance": "Appearance",
         "theme": "Theme",
         "themeDescription": "Choose your preferred color theme",
+        "showStoreOnGameCard": "Show Store Name",
+        "showStoreOnGameCardDescription": "Display the store name (Steam, Epic, Custom) on game cards",
         "darkMode": "Dark",
         "lightMode": "Light",
         "language": "Language",

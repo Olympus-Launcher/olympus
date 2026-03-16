@@ -42,7 +42,8 @@ const store = new Store({
     settings: {
       theme: 'dark',
       scanOnStartup: true,
-      hardwareAcceleration: true
+      hardwareAcceleration: true,
+      showStoreOnGameCard: true
     }
   }
 })

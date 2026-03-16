@@ -15,6 +15,7 @@ interface GameCardProps {
   onToggleFavorite: (gameId: string) => void
   onEdit: (game: GameInfo) => void
   themeColors: ThemeColors
+  showStoreOnGameCard: boolean
 }
 
 const storeLogos: Record<string, ReactElement> = {
@@ -23,7 +24,7 @@ const storeLogos: Record<string, ReactElement> = {
   custom: cloneElement(sidebarIcons.custom, { className: 'w-4 h-4' }),
 }
 
-export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, onUnhide, onToggleFavorite, onEdit, themeColors }: GameCardProps) {
+export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, onUnhide, onToggleFavorite, onEdit, themeColors, showStoreOnGameCard }: GameCardProps) {
   const { t } = useTranslation()
   const [showMenu, setShowMenu] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
@@ -75,12 +76,14 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
         </div>
 
         <div className="flex items-center gap-2">
-          <span 
-            className="px-2 py-1 rounded text-xs font-medium"
-            style={{ backgroundColor: 'transparent', color: themeColors.textSecondary }}
-          >
-            {game.store.charAt(0).toUpperCase() + game.store.slice(1)}
-          </span>
+          {showStoreOnGameCard && (
+            <span 
+              className="px-2 py-1 rounded text-xs font-medium"
+              style={{ backgroundColor: 'transparent', color: themeColors.textSecondary }}
+            >
+              {game.store.charAt(0).toUpperCase() + game.store.slice(1)}
+            </span>
+          )}
 
           {game.isFavorite && (
             <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
@@ -181,13 +184,15 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
         </div>
 
         <div className="absolute top-2 left-2">
-          <span 
-            className="px-2 py-1 rounded text-xs font-medium text-white flex items-center gap-1"
-            style={{ backgroundColor: 'transparent', textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}
-          >
-            {storeLogos[game.store]}
-            {game.store.charAt(0).toUpperCase() + game.store.slice(1)}
-          </span>
+          {showStoreOnGameCard && (
+            <span 
+              className="px-2 py-1 rounded text-xs font-medium text-white flex items-center gap-1"
+              style={{ backgroundColor: 'transparent', textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}
+            >
+              {storeLogos[game.store]}
+              {game.store.charAt(0).toUpperCase() + game.store.slice(1)}
+            </span>
+          )}
         </div>
 
         <div className="absolute top-2 right-2 flex gap-1">
@@ -255,11 +260,9 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
           <h3 className="font-medium text-sm truncate" style={{ color: themeColors.text }}>{game.name || 'Unknown Game'}</h3>
           <p className="text-xs mt-1 truncate" style={{ color: themeColors.textSecondary }}>{formatLastPlayed(game.lastPlayed)}</p>
           {game.playCount !== undefined && game.playCount > 0 && (
-            <Tooltip text={t('gameCard.playCount', { count: game.playCount })}>
               <p className="text-xs mt-0.5 truncate" style={{ color: themeColors.textSecondary }}>
                 {t('gameCard.playedTimes', { count: game.playCount })}
               </p>
-            </Tooltip>
           )}
       </div>
     </div>

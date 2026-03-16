@@ -20,6 +20,7 @@ export interface Settings {
   scanOnStartup: boolean
   hardwareAcceleration: boolean
   language?: string
+  showStoreOnGameCard?: boolean
   integrations?: {
     steamGridDBApiKey?: string
   }

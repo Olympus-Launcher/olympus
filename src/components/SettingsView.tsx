@@ -236,6 +236,8 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                   </div>
                 </div>
 
+                <div className="h-px my-4" style={{ backgroundColor: themeColors.border }} />
+
                 <div>
                   <p className="font-medium mb-1" style={{ color: themeColors.text }}>{t('settings.tabs.application.theme')}</p>
                   <p className="text-sm mb-3" style={{ color: themeColors.textSecondary }}>{t('settings.tabs.application.themeDescription')}</p>
@@ -278,6 +280,29 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                         ))}
                       </div>
                     )}
+                  </div>
+
+                  <div className="h-px my-4" style={{ backgroundColor: themeColors.border }} />
+
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium" style={{ color: themeColors.text }}>{t('settings.tabs.application.showStoreOnGameCard')}</p>
+                      <p className="text-sm" style={{ color: themeColors.textSecondary }}>{t('settings.tabs.application.showStoreOnGameCardDescription')}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const newValue = localSettings.showStoreOnGameCard === false
+                        const newSettings = { ...localSettings, showStoreOnGameCard: newValue }
+                        setLocalSettings(newSettings)
+                        onSave(newSettings)
+                      }}
+                      className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${localSettings.showStoreOnGameCard === false ? '' : 'bg-primary-600'}`}
+                      style={{ backgroundColor: localSettings.showStoreOnGameCard === false ? themeColors.border : undefined }}
+                    >
+                      <span
+                        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${localSettings.showStoreOnGameCard === false ? 'translate-x-0' : 'translate-x-5'}`}
+                      />
+                    </button>
                   </div>
                 </div>
               </div>

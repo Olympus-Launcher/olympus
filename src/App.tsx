@@ -497,6 +497,7 @@ function App() {
                 isScanning={isScanning}
                 onScan={scanForGames}
                 themeColors={themeColors}
+                showStoreOnGameCard={settings.showStoreOnGameCard ?? true}
               />
             </>
           )}
