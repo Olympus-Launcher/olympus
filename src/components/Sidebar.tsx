@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { ViewType } from '../types'
 import { project, ThemeMode, themes } from '../config'
 import { sidebarIcons } from '../config/sidebarIcons'
+import { Tooltip } from './Tooltip'
 
 interface SidebarProps {
   currentView: ViewType
@@ -113,24 +114,26 @@ export default function Sidebar({ currentView, onViewChange, gameCounts, theme, 
             </div>
             <div className="flex justify-center gap-2">
               {storesFound?.steam && (
-                <button
-                  onClick={() => onLaunchStore('steam')}
-                  className="p-2 rounded-lg hover:bg-theme-border transition-colors flex items-center justify-center"
-                  style={{ color: themeColors.textSecondary }}
-                  title={t('sidebar.openSteam')}
-                >
-                  <span className="text-base">{sidebarIcons.steam}</span>
-                </button>
+                <Tooltip text={t('sidebar.openSteam')}>
+                  <button
+                    onClick={() => onLaunchStore('steam')}
+                    className="p-2 rounded-lg hover:bg-theme-border transition-colors flex items-center justify-center"
+                    style={{ color: themeColors.textSecondary }}
+                  >
+                    <span className="text-base">{sidebarIcons.steam}</span>
+                  </button>
+                </Tooltip>
               )}
               {storesFound?.epic && (
-                <button
-                  onClick={() => onLaunchStore('epic')}
-                  className="p-2 rounded-lg hover:bg-theme-border transition-colors flex items-center justify-center"
-                  style={{ color: themeColors.textSecondary }}
-                  title={t('sidebar.openEpicGames')}
-                >
-                  <span className="text-base">{sidebarIcons.epic}</span>
-                </button>
+                <Tooltip text={t('sidebar.openEpicGames')}>
+                  <button
+                    onClick={() => onLaunchStore('epic')}
+                    className="p-2 rounded-lg hover:bg-theme-border transition-colors flex items-center justify-center"
+                    style={{ color: themeColors.textSecondary }}
+                  >
+                    <span className="text-base">{sidebarIcons.epic}</span>
+                  </button>
+                </Tooltip>
               )}
             </div>
           </div>

@@ -8,6 +8,7 @@ import TitleBar from './components/TitleBar'
 import ScanProgressModal from './components/ScanProgressModal'
 import EditGameModal from './components/EditGameModal'
 import ChangelogModal from './components/ChangelogModal'
+import { TooltipProvider } from './components/Tooltip'
 import { GameInfo, ViewType, Settings } from './types'
 import { themes } from './config'
 import { changeLanguage } from './i18n'
@@ -332,8 +333,9 @@ function App() {
   } as React.CSSProperties
 
   return (
-    <div className="h-screen w-screen flex flex-col" style={appStyle}>
-      <TitleBar theme={settings.theme} onSettingsClick={() => setCurrentView('settings')} />
+    <TooltipProvider theme={settings.theme}>
+      <div className="h-screen w-screen flex flex-col" style={appStyle}>
+        <TitleBar theme={settings.theme} onSettingsClick={() => setCurrentView('settings')} />
       
        {updateStatus && updateStatus.status === 'available' && (
          <div className="bg-primary-600 px-4 py-2 flex items-center justify-between text-white">
@@ -522,13 +524,14 @@ function App() {
          progress={scanProgress}
        />
 
-       <ChangelogModal
-         isOpen={showChangelog}
-         onClose={() => setShowChangelog(false)}
-         version={updateStatus?.version}
-       />
-     </div>
-   )
+        <ChangelogModal
+          isOpen={showChangelog}
+          onClose={() => setShowChangelog(false)}
+          version={updateStatus?.version}
+        />
+      </div>
+    </TooltipProvider>
+  )
 }
 
 export default App

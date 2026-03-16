@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { GameInfo } from '../types'
 import { ThemeMode } from '../config'
 import SteamGridDBModal from './SteamGridDBModal'
+import { Tooltip } from './Tooltip'
 
 interface EditGameModalProps {
   game: GameInfo
@@ -138,14 +139,15 @@ export default function EditGameModal({ game, theme, onClose, onSave }: EditGame
               >
                 {t('editGame.browse')}
               </button>
+              <Tooltip text={t('editGame.steamGridDBTooltip')}>
               <button
                 type="button"
                 onClick={() => setShowSteamGridDB(true)}
                 className="px-4 py-2 bg-theme-card border border-theme-border rounded-lg text-primary-500 hover:bg-theme-border transition-colors"
-                title={t('editGame.steamGridDBTooltip')}
               >
                 {t('editGame.steamGridDB')}
               </button>
+              </Tooltip>
             </div>
           </div>
 
