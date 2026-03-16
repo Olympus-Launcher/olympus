@@ -26,7 +26,10 @@
     "recentlyPlayed": "Jogado Recentemente",
     "settings": "Definições",
     "yourGames": "Os Teus Jogos",
-    "customGamesTab": "Jogos Adicionados"
+    "customGamesTab": "Jogos Adicionados",
+    "foundClients": "Clientes Encontrados",
+    "openSteam": "Abrir a Steam",
+    "openEpicGames": "Abrir a Epic Games"
   },
 
   "gameGrid": {

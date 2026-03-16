@@ -26,7 +26,10 @@
     "recentlyPlayed": "Recently Played",
     "settings": "Settings",
     "yourGames": "Your PC Games",
-    "customGamesTab": "Custom"
+    "customGamesTab": "Custom",
+    "foundClients": "Found Clients",
+    "openSteam": "Launch Steam",
+    "openEpicGames": "Launch Epic Games"
   },
 
   "gameGrid": {

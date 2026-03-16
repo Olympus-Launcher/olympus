@@ -107,7 +107,7 @@ export default function Sidebar({ currentView, onViewChange, gameCounts, theme, 
             <div className="flex items-center justify-between mb-3">
               <div className="h-px bg-theme-border flex-1"></div>
               <span className="text-xs font-medium px-2" style={{ color: themeColors.textSecondary }}>
-                Clients
+                {t('sidebar.foundClients')}
               </span>
               <div className="h-px bg-theme-border flex-1"></div>
             </div>
@@ -117,7 +117,7 @@ export default function Sidebar({ currentView, onViewChange, gameCounts, theme, 
                   onClick={() => onLaunchStore('steam')}
                   className="p-2 rounded-lg hover:bg-theme-border transition-colors flex items-center justify-center"
                   style={{ color: themeColors.textSecondary }}
-                  title={`Open ${project.supportedStoreNames.steam}`}
+                  title={t('sidebar.openSteam')}
                 >
                   <span className="text-base">{sidebarIcons.steam}</span>
                 </button>
@@ -127,7 +127,7 @@ export default function Sidebar({ currentView, onViewChange, gameCounts, theme, 
                   onClick={() => onLaunchStore('epic')}
                   className="p-2 rounded-lg hover:bg-theme-border transition-colors flex items-center justify-center"
                   style={{ color: themeColors.textSecondary }}
-                  title={`Open ${project.supportedStoreNames.epic}`}
+                  title={t('sidebar.openEpicGames')}
                 >
                   <span className="text-base">{sidebarIcons.epic}</span>
                 </button>
