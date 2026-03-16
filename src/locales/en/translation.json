@@ -53,6 +53,7 @@
     "playedDaysAgo": "Played {{days}} days ago",
     "playedWeeksAgo": "Played {{weeks}} weeks ago",
     "playedMonthsAgo": "Played {{months}} months ago",
+    "playedTimes": "Played {{count}} times",
     "context_menu_edit": "Edit",
     "context_menu_hide": "Hide",
     "context_menu_remove": "Remove",

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { GameInfo } from '../types'
 import { ThemeColors } from '../config'
 import { sidebarIcons } from '../config/sidebarIcons'
+import { Tooltip } from './Tooltip'
 
 interface GameCardProps {
   game: GameInfo
@@ -66,6 +67,11 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold truncate" style={{ color: themeColors.text }}>{game.name || 'Unknown Game'}</h3>
           <p className="text-sm" style={{ color: themeColors.textSecondary }}>{formatLastPlayed(game.lastPlayed)}</p>
+          {game.playCount !== undefined && game.playCount > 0 && (
+            <p className="text-sm" style={{ color: themeColors.textSecondary }}>
+              {t('gameCard.playedTimes', { count: game.playCount })}
+            </p>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -248,6 +254,13 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
         <div className="p-3">
           <h3 className="font-medium text-sm truncate" style={{ color: themeColors.text }}>{game.name || 'Unknown Game'}</h3>
           <p className="text-xs mt-1 truncate" style={{ color: themeColors.textSecondary }}>{formatLastPlayed(game.lastPlayed)}</p>
+          {game.playCount !== undefined && game.playCount > 0 && (
+            <Tooltip text={t('gameCard.playCount', { count: game.playCount })}>
+              <p className="text-xs mt-0.5 truncate" style={{ color: themeColors.textSecondary }}>
+                {t('gameCard.playedTimes', { count: game.playCount })}
+              </p>
+            </Tooltip>
+          )}
       </div>
     </div>
   )
