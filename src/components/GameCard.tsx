@@ -49,8 +49,12 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
   if (viewMode === 'list') {
     return (
       <div 
-        className="game-card flex items-center gap-4 p-4 rounded-xl border hover:border-primary-500/30 select-none"
-        style={{ backgroundColor: themeColors.card, borderColor: themeColors.border }}
+        className="game-card relative flex items-center gap-4 p-4 rounded-xl border hover:border-primary-500/30 select-none"
+        style={{ 
+          backgroundColor: themeColors.card, 
+          borderColor: themeColors.border,
+          zIndex: showMenu ? 40 : undefined
+        }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => { setIsHovered(false); setShowMenu(false) }}
       >
@@ -103,7 +107,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
               </button>
 
               {showMenu && (
-                <div className="absolute right-0 top-full mt-1 min-w-[140px] rounded-lg shadow-xl z-10 overflow-hidden" style={{ backgroundColor: themeColors.surface, borderColor: themeColors.border, borderWidth: 1, borderStyle: 'solid' }}>
+                <div className="absolute right-0 top-full mt-1 min-w-[140px] rounded-lg shadow-xl z-50 overflow-hidden" style={{ backgroundColor: themeColors.surface, borderColor: themeColors.border, borderWidth: 1, borderStyle: 'solid' }}>
                   <button
                     onClick={() => { onEdit(game); setShowMenu(false) }}
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10"
@@ -146,7 +150,11 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
   return (
     <div 
       className="game-card group relative rounded-xl overflow-hidden border select-none"
-      style={{ backgroundColor: themeColors.card, borderColor: themeColors.border }}
+      style={{ 
+        backgroundColor: themeColors.card, 
+        borderColor: themeColors.border,
+        zIndex: showMenu ? 40 : undefined
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => { setIsHovered(false); setShowMenu(false) }}
     >
@@ -219,7 +227,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
           </button>
 
               {showMenu && (
-                <div className="absolute right-0 top-full mt-1 min-w-[140px] rounded-lg shadow-xl z-10 overflow-hidden" style={{ backgroundColor: themeColors.surface, borderColor: themeColors.border, borderWidth: 1, borderStyle: 'solid' }}>
+                <div className="absolute right-0 top-full mt-1 min-w-[140px] rounded-lg shadow-xl z-50 overflow-hidden" style={{ backgroundColor: themeColors.surface, borderColor: themeColors.border, borderWidth: 1, borderStyle: 'solid' }}>
                   <button
                     onClick={() => { onEdit(game); setShowMenu(false) }}
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10"
