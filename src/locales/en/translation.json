@@ -29,7 +29,8 @@
     "customGamesTab": "Custom",
     "foundClients": "Found Clients",
     "openSteam": "Launch Steam",
-    "openEpicGames": "Launch Epic Games"
+    "openEpicGames": "Launch Epic Games",
+    "openEA": "Launch EA App"
   },
 
   "gameGrid": {
@@ -180,6 +181,7 @@
     "scanningGames": "Scanning for Games",
     "scanningSteamGames": "Scanning for Steam games...",
     "scanningEpicGames": "Scanning for Epic games...",
+    "scanningEAGames": "Scanning for EA games...",
     "scanComplete": "Scan complete!",
     "preparingToScan": "Preparing to scan..."
   },
