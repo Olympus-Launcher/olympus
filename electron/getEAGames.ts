@@ -139,6 +139,26 @@ async function getEAGamesFromRegistry(): Promise<OriginGame[]> {
   })
 }
 
+async function getInstalledEALicenseIds(): Promise<Set<string>> {
+  const licenseDir = 'C:\\ProgramData\\Electronic Arts\\EA Services\\License'
+  const installedIds = new Set<string>()
+  
+  try {
+    const files = await fs.readdir(licenseDir)
+    for (const file of files) {
+      if (file.endsWith('.dlf')) {
+        const gameId = file.replace('.dlf', '')
+        installedIds.add(gameId)
+      }
+    }
+    log.info(`Found ${installedIds.size} EA game licenses`)
+  } catch (error) {
+    log.debug('Could not read EA License folder:', error)
+  }
+  
+  return installedIds
+}
+
 export async function getEAGames(): Promise<EAGame[]> {
   log.info('Detecting EA games...')
   const games: EAGame[] = []
@@ -159,10 +179,19 @@ export async function getEAGames(): Promise<EAGame[]> {
 
     log.info(`EA App found at: ${eaPath}`)
 
-    const registryGames = await getEAGamesFromRegistry()
-    log.info(`Found ${registryGames.length} EA games in registry`)
+    const [registryGames, installedLicenses] = await Promise.all([
+      getEAGamesFromRegistry(),
+      getInstalledEALicenseIds()
+    ])
+    
+    log.info(`Found ${registryGames.length} EA games in registry, ${installedLicenses.size} have valid licenses`)
 
     for (const game of registryGames) {
+      if (!installedLicenses.has(game.id)) {
+        log.debug(`Skipping uninstalled EA game: ${game.displayName} (${game.id}) - no license found`)
+        continue
+      }
+      
       const launchUri = `origin2://game/launch?offerIds=${game.id}`
       const cleanName = cleanGameName(game.displayName)
       
