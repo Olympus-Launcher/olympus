@@ -19,9 +19,14 @@ export interface Settings {
   theme: ThemeMode
   scanOnStartup: boolean
   hardwareAcceleration: boolean
+  language?: string
+  showStoreOnGameCard?: boolean
+  integrations?: {
+    steamGridDBApiKey?: string
+  }
 }
 
-export type ViewType = 'all' | 'favorites' | 'recent' | 'steam' | 'epic' | 'custom' | 'settings'
+export type ViewType = 'all' | 'favorites' | 'recent' | 'steam' | 'epic' | 'ea' | 'custom' | 'settings'
 
 export interface UpdateStatus {
   status: 'checking' | 'available' | 'not-available' | 'downloading' | 'downloaded' | 'error' | 'dev-mode'

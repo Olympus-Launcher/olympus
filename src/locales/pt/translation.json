@@ -1,0 +1,210 @@
+{
+
+  "app": {
+
+    "header": {
+      "games": "jogos",
+      "game": "jogo"
+    },
+    
+    "search": {
+      "placeholder": "Procurar jogo..."
+    },
+
+    "loading": "A carregar...",
+    "version": "v",
+    "description": "Let your games reside in Mount Olympus and launch them from there.",
+    "steamGamesTitle": "Biblioteca Steam",
+    "epicGamesTitle": "Biblioteca Epic Games",
+    "eaGamesTitle": "Biblioteca da EA",
+    "customGamesTitle": "Jogos adicionados por ti",
+    "addGameButton": "Adicionar Jogo"
+  },
+
+  "sidebar": {
+    "allGames": "Todos os Jogos",
+    "favorites": "Favoritos",
+    "recentlyPlayed": "Jogado Recentemente",
+    "settings": "Definições",
+    "yourGames": "Os Teus Jogos",
+    "customGamesTab": "Jogos Adicionados",
+    "foundClients": "Clientes Encontrados",
+    "openSteam": "Abrir a Steam",
+    "openEpicGames": "Abrir a Epic Games",
+    "openEA": "Abrir a EA App"
+  },
+
+  "gameGrid": {
+    "noGamesFound": "Nenhum Jogo Encontrado",
+    "noGamesDescription": "Começa por procurar jogos instalados ou adicionar um jogo manualmente.",
+    "scanForGames": "Procurar Jogos",
+    "scanning": "A procurar...",
+    "gridView": "Vista em Grelha",
+    "listView": "Vista em Lista",
+    "scanningForGames": "A procurar jogos..."
+  },
+
+  "gameCard": {
+    "play": "Jogar",
+    "favorite": "Favorito",
+    "addToFavorites": "Adicionar aos Favoritos",
+    "removeFromFavorites": "Remover dos Favoritos",
+    "neverPlayed": "Nunca jogado",
+    "playedToday": "Jogado hoje",
+    "playedYesterday": "Jogado ontem",
+    "playedDaysAgo": "Jogado há {{days}} dias",
+    "playedWeeksAgo": "Jogado há {{weeks}} semanas",
+    "playedMonthsAgo": "Jogado há {{months}} meses",
+    "playedTimes": "Jogado {{count}} vezes",
+    "context_menu_edit": "Editar",
+    "context_menu_hide": "Ocultar",
+    "context_menu_remove": "Remover",
+    "unhide": "Mostrar"
+  },
+
+  "addGame": {
+    "title": "Adicionar Jogo",
+    "gameName": "Nome do Jogo",
+    "gameNamePlaceholder": "Nome do jogo",
+    "executablePath": "Caminho do Executável (.exe)",
+    "executablePathPlaceholder": "C:\\Games\\game.exe",
+    "coverImage": "Imagem de Capa (opcional mas recomendado)",
+    "coverImagePlaceholder": "C:\\Images\\cover.jpg",
+    "storeSource": "Loja / Fonte",
+    "browse": "Procurar",
+    "cancel": "Cancelar",
+    "addGame": "Adicionar Jogo",
+    "adding": "A adicionar...",
+    "save": "Guardar"
+  },
+
+  "editGame": {
+    "title": "Editar Jogo",
+    "gameName": "Nome do Jogo",
+    "executablePath": "Caminho do Executável (.exe)",
+    "coverImage": "Imagem de Capa",
+    "onlyCoverEditable": "Apenas a capa do jogo pode ser alterada para jogos da {{store}}.",
+    "browse": "Procurar",
+    "steamGridDB": "SteamGridDB",
+    "steamGridDBTooltip": "Fazer download de uma capa através do SteamGridDB"
+  },
+
+  "settings": {
+    "title": "Definições",
+
+    "tabs": {
+      "application": {
+        "tabLabel": "Aplicação",
+        "application": "Aplicação",
+        "library": "Biblioteca",
+        "scanOnStartup": "Procurar jogos no arranque",
+        "scanOnStartupDescription": "Se ativado, o Olympus irá procurar por jogos instalados no teu computador cada vez que o iniciares.",
+        "manualScan": "Procura Manual",
+        "manualScanDescription": "Procura por jogos instalados no teu computador através da Steam, Epic Games e EA App. Jogos instalados manualmente, devem ser adicionados ao Olympus manualmente.",
+        "hardwareAcceleration": "Aceleração de Hardware",
+        "hardwareAccelerationDescription": "Ativa ou desativa a aceleração de hardware. Desativar pode ajudar a resolver problemas gráficos, mas pode causar um desempenho geral mais lento.",
+        "appearance": "Aparência",
+        "theme": "Tema",
+        "themeDescription": "Escolhe o tema que preferires para a aplicação.",
+        "showStoreOnGameCard": "Mostrar Nome da Loja",
+        "showStoreOnGameCardDescription": "Mostrar o nome da loja (Steam, Epic, EA App, Personalizado) nos cartões de jogos",
+        "darkMode": "Escuro",
+        "lightMode": "Claro",
+        "language": "Língua",
+        "languageDescription": "Escolhe a língua que preferires para a aplicação.",
+        "languageDropdown": {
+          "en": "Inglês",
+          "pt": "Português (Portugal)"
+        }
+      },
+
+      "hidden_games": {
+        "tabLabel": "Jogos Ocultos",
+        "hidden_games": "Jogos Ocultos",
+        "noHiddenGames": "De momento não tens jogos ocultos.",
+        "unhide": "Mostrar"
+      },
+
+      "integrations": {
+        "tabLabel": "Integrações",
+        "steamGridDB": "SteamGridDB",
+        "steamGridDBSubtitle": "Chave de API",
+        "steamGridDBDescription": "Configura a tua chave de API do SteamGridDB para poderes fazer download de capas para os teus jogos diretamente através do Olympus. Podes obter a tua chave gratuitamente em ",
+        "apiKey": "API",
+        "apiKeyPlaceholder": "Insere aqui a tua Chave de API do SteamGridDB",
+        "getApiKey": "Obter uma Chave de API gratuita.",
+        "apiKeyFrom": "steamgriddb.com/profile/preferences/api",
+        "testConnection": "Testar Ligação",
+        "testing": "A testar...",
+        "apiKeyValid": "A tua Chave de API está válida!",
+        "apiKeyInvalid": "A Chave de API que inseriste é inválida. Por favor, verifica e tenta novamente.",
+        "apiKeyConfigured": "A tua Chave de API está válida e configurada!",
+        "removeApiKey": "Remover Chave de API"
+      },
+
+      "about": {
+        "tabLabel": "Sobre",
+        "about": "Sobre",
+        "version": "Versão",
+        "aboutText": "O Olympus é um launcher de jogos leve e personalizável para PC, projetado para organizar e correr todos os teus jogos a partir de um único local. Suporta jogos da Steam, Epic Games, EA, e jogos adicionados manualmente, oferecendo uma experiência de utilizador fluida e agradável.",
+        "withLove": "Feito em Portugal com ❤️",
+        "update": "Atualizar Aplicação",
+        "checkUpdatesButton": "Verificar Atualizações",
+        "error": "Erro",
+        "updateAreaDescription": "Verificar atualizações manualmente e instalar se disponíveis."
+      }
+    },
+    
+    "restartToApply": "Reinício necessário para aplicar alterações!",
+    "restartNow": "Reiniciar Agora"
+  },
+
+  "steamGridDB": {
+    "title": "Fazer download de capa através do SteamGridDB",
+    "searching": "A procurar...",
+    "foundMultiple": "Foram encontrados vários jogos com o nome semelhante. Escolhe o jogo correcto:",
+    "chooseDifferent": "Escolher um jogo diferente",
+    "selectCover": "Seleciona uma capa:",
+    "noCovers": "Não foram encontradas capas para este jogo.",
+    "failedToLoadCovers": "Houve um problema ao carregar capas para este jogo.",
+    "gameNotFound": "O jogo que procuraste não foi encontrado.",
+    "failedToSearchGames": "Houve um problema ao procurar por jogos.",
+    "failedToDownloadCover": "Houve um problema ao descarregar a capa para este jogo.",
+    "tryAgain": "Tentar novamente",
+    "downloading": "A descarregar...",
+    "download": "Descarregar",
+    "cancel": "Cancelar",
+    "verified_game": "Verificado",
+    "steam_game": "Steam"
+  },
+
+  "scanProgress": {
+    "scanningGames": "A procurar jogos",
+    "scanningSteamGames": "A procurar por jogos da Steam...",
+    "scanningEpicGames": "A procurar por jogos da Epic...",
+    "scanningEAGames": "A procurar por jogos da EA...",
+    "scanComplete": "Procura concluída!",
+    "preparingToScan": "A preparar para procurar...",
+    "foundGames": "{{current}} de {{total}} jogos encontrados" 
+  },
+
+  "changelog": {
+    "title": "Novidades",
+    "viewOnline": "Ler changelog online",
+    "version": "Versão {{version}}",
+    "noChanges": "Não foram encontradas entradas no changelog."
+  },
+
+  "update": {
+    "checkingUpdates": "A procurar atualizações...",
+    "updateAvailable": "Atualização {{version}} está disponível!",
+    "updateAvailableButton": "Descarregar & Instalar",
+    "downloadingUpdate": "A descarregar atualização... {{percent}}",
+    "updateReadyToInstall": "Atualização {{version}} está pronta a instalar.",
+    "updateReadyToInstallButton": "Reiniciar & Instalar",
+    "latestVersion": "O Olympus está atualizado!",
+    "updateTryAgain": "Tentar novamente",
+    "changelogButton": "Novidades"
+  }
+
+}

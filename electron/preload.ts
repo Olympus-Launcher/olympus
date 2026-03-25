@@ -42,6 +42,22 @@ export interface UpdateStatus {
   error?: string
 }
 
+export interface SteamGridDBGame {
+  id: number
+  name: string
+  types: string[]
+  verified: boolean
+}
+
+export interface SteamGridDBGrid {
+  id: number
+  url: string
+  thumb: string
+  style: string
+  dimensions: string
+  likes: number
+}
+
 interface ElectronAPI {
   getGames: () => Promise<GameInfo[]>
   getAllGames: () => Promise<GameInfo[]>
@@ -57,8 +73,8 @@ interface ElectronAPI {
   saveGameCover: (gameId: string, imagePath: string) => Promise<string>
   getSettings: () => Promise<Settings>
   saveSettings: (settings: Settings) => Promise<boolean>
-  refreshStorePaths: () => Promise<{ steam: string | null; epic: string | null }>
-  getStorePaths: () => Promise<{ steamPath: string | null; epicPath: string | null }>
+  refreshStorePaths: () => Promise<{ steam: string | null; epic: string | null; ea: string | null }>
+  getStorePaths: () => Promise<{ steamPath: string | null; epicPath: string | null; eaPath: string | null }>
   getFavorites: () => Promise<string[]>
   saveFavorites: (favoriteIds: string[]) => Promise<boolean>
   toggleFavorite: (gameId: string) => Promise<string[]>
@@ -74,6 +90,14 @@ interface ElectronAPI {
   onScanProgress: (callback: (progress: { current: number; total: number; currentGame: string; store: string }) => void) => () => void
   onUpdateStatus: (callback: (status: UpdateStatus) => void) => () => void
   fetchChangelog: () => Promise<{ content: string; error?: string }>
+  searchSteamGridDB: (query: string) => Promise<{ games: SteamGridDBGame[]; error?: string }>
+  getSteamGridDBGrids: (gameId: number) => Promise<{ grids: SteamGridDBGrid[]; error?: string }>
+  getSteamGridDBGridsByAppId: (appId: string) => Promise<{ grids: SteamGridDBGrid[]; error?: string }>
+  downloadSteamGridDBCover: (gridUrl: string, gameId: string) => Promise<{ path: string; error?: string }>
+  initSteamGridDB: (apiKey: string) => Promise<{ success: boolean; error?: string }>
+  validateSteamGridDBKey: () => Promise<{ success: boolean; error?: string }>
+  checkSteamGridDBStatus: () => Promise<{ initialized: boolean }>
+  openExternal: (url: string) => Promise<{ success: boolean; error?: string }>
 }
 
 const electronAPI: ElectronAPI = {
@@ -91,8 +115,8 @@ const electronAPI: ElectronAPI = {
   saveGameCover: (gameId: string, imagePath: string): Promise<string> => ipcRenderer.invoke('save-game-cover', gameId, imagePath),
   getSettings: (): Promise<Settings> => ipcRenderer.invoke('get-settings'),
   saveSettings: (settings: Settings): Promise<boolean> => ipcRenderer.invoke('save-settings', settings),
-  refreshStorePaths: (): Promise<{ steam: string | null; epic: string | null }> => ipcRenderer.invoke('refresh-store-paths'),
-  getStorePaths: (): Promise<{ steamPath: string | null; epicPath: string | null }> => ipcRenderer.invoke('get-store-paths'),
+  refreshStorePaths: (): Promise<{ steam: string | null; epic: string | null; ea: string | null }> => ipcRenderer.invoke('refresh-store-paths'),
+  getStorePaths: (): Promise<{ steamPath: string | null; epicPath: string | null; eaPath: string | null }> => ipcRenderer.invoke('get-store-paths'),
   getFavorites: (): Promise<string[]> => ipcRenderer.invoke('get-favorites'),
   saveFavorites: (favoriteIds: string[]): Promise<boolean> => ipcRenderer.invoke('save-favorites', favoriteIds),
   toggleFavorite: (gameId: string): Promise<string[]> => ipcRenderer.invoke('toggle-favorite', gameId),
@@ -115,7 +139,15 @@ const electronAPI: ElectronAPI = {
     ipcRenderer.on('update-status', handler)
     return () => ipcRenderer.removeListener('update-status', handler)
   },
-  fetchChangelog: (): Promise<{ content: string; error?: string }> => ipcRenderer.invoke('fetch-changelog')
+  fetchChangelog: (): Promise<{ content: string; error?: string }> => ipcRenderer.invoke('fetch-changelog'),
+  searchSteamGridDB: (query: string): Promise<{ games: SteamGridDBGame[]; error?: string }> => ipcRenderer.invoke('search-steamgriddb', query),
+  getSteamGridDBGrids: (gameId: number): Promise<{ grids: SteamGridDBGrid[]; error?: string }> => ipcRenderer.invoke('get-steamgriddb-grids', gameId),
+  getSteamGridDBGridsByAppId: (appId: string): Promise<{ grids: SteamGridDBGrid[]; error?: string }> => ipcRenderer.invoke('get-steamgriddb-grids-by-appid', appId),
+  downloadSteamGridDBCover: (gridUrl: string, gameId: string): Promise<{ path: string; error?: string }> => ipcRenderer.invoke('download-steamgriddb-cover', gridUrl, gameId),
+  initSteamGridDB: (apiKey: string): Promise<{ success: boolean; error?: string }> => ipcRenderer.invoke('init-steamgriddb', apiKey),
+  validateSteamGridDBKey: (): Promise<{ success: boolean; error?: string }> => ipcRenderer.invoke('validate-steamgriddb-key'),
+  checkSteamGridDBStatus: (): Promise<{ initialized: boolean }> => ipcRenderer.invoke('check-steamgriddb-status'),
+  openExternal: (url: string): Promise<{ success: boolean; error?: string }> => ipcRenderer.invoke('open-external', url)
 }
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI)

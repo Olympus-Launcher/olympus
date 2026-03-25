@@ -1,12 +1,12 @@
 export const project = {
-  name: 'Olympus Frontend',
-  version: '1.1.1',
-  description: 'Let your games reside in Mount Olympus and launch them from there.',
+  name: 'Olympus',
+  version: '1.2.0',
   author: 'Salierus',
-  supportedStores: ['steam', 'epic', 'custom'] as const,
+  supportedStores: ['steam', 'epic', 'ea', 'custom'] as const,
   supportedStoreNames: {
     steam: 'Steam',
     epic: 'Epic Games',
+    ea: 'EA App',
     custom: 'Custom'
   }
 }

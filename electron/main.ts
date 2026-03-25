@@ -8,41 +8,26 @@ import Store from 'electron-store'
 import { autoUpdater } from 'electron-updater'
 import { getSteamGames, getSteamLaunchUrl, getSteamInstallPath } from './getSteamGames'
 import { getEpicGames } from './getEpicGames'
+import { getEAGames } from './getEAGames'
 import { isAppRunning } from './gameProcess'
 import { updateStorePaths, getEpicInstallPath } from './getStoresPath'
 import { GameInfo, Settings } from './types'
+import { 
+  initSteamGridDB, 
+  searchSteamGridDB, 
+  getSteamGridDBGrids, 
+  getSteamGridDBGridsBySteamAppId,
+  downloadSteamGridDBCover,
+  isExactMatch,
+  isClientInitialized,
+  validateSteamGridDBKey
+} from './steamGridDB'
 
 const currentVersion = app.getVersion()
 
 log.transports.file.level = 'info'
 log.transports.console.level = 'debug'
 log.info('Application starting...')
-
-const settingsFilePath = path.join(app.getPath('userData'), 'config', 'settings.json')
-let hardwareAccelerationEnabled = true
-
-if (fs.existsSync(settingsFilePath)) {
-  try {
-    const settingsData = JSON.parse(fs.readFileSync(settingsFilePath, 'utf-8'))
-    hardwareAccelerationEnabled = settingsData.settings?.hardwareAcceleration ?? true
-    log.info(`Hardware acceleration setting: ${hardwareAccelerationEnabled}`)
-  } catch (error) {
-    log.error('Error reading settings:', error)
-  }
-}
-
-if (!hardwareAccelerationEnabled) {
-  app.disableHardwareAcceleration()
-  log.info('Hardware acceleration disabled')
-}
-
-process.on('uncaughtException', (error) => {
-  log.error('Uncaught Exception:', error)
-})
-
-process.on('unhandledRejection', (reason) => {
-  log.error('Unhandled Rejection:', reason)
-})
 
 const configDir = path.join(app.getPath('userData'), 'config')
 if (!fs.existsSync(configDir)) {
@@ -58,9 +43,27 @@ const store = new Store({
     settings: {
       theme: 'dark',
       scanOnStartup: true,
-      hardwareAcceleration: true
+      hardwareAcceleration: true,
+      showStoreOnGameCard: true
     }
   }
+})
+
+const startupSettings = store.get('settings') as Settings
+let hardwareAccelerationEnabled = startupSettings?.hardwareAcceleration ?? true
+log.info(`Hardware acceleration setting: ${hardwareAccelerationEnabled}`)
+
+if (!hardwareAccelerationEnabled) {
+  app.disableHardwareAcceleration()
+  log.info('Hardware acceleration disabled')
+}
+
+process.on('uncaughtException', (error) => {
+  log.error('Uncaught Exception:', error)
+})
+
+process.on('unhandledRejection', (reason) => {
+  log.error('Unhandled Rejection:', reason)
 })
 
 let mainWindow: BrowserWindow | null = null
@@ -116,6 +119,12 @@ function createWindow() {
 app.whenReady().then(() => {
   log.info('App ready')
   updateStorePaths()
+  
+  const currentSettings = store.get('settings') as Settings
+  if (currentSettings.integrations?.steamGridDBApiKey) {
+    initSteamGridDB(currentSettings.integrations.steamGridDBApiKey)
+  }
+  
   createWindow()
 
   globalShortcut.register('CommandOrControl+Shift+I', () => {
@@ -228,7 +237,10 @@ ipcMain.handle('scan-games', async (event) => {
     sendProgress(0, 0, '', 'epic')
     const epicGames = await getEpicGames()
 
-    const allDetectedGames = [...steamGames, ...epicGames]
+    sendProgress(0, 0, '', 'ea')
+    const eaGames = await getEAGames()
+
+    const allDetectedGames = [...steamGames, ...epicGames, ...eaGames]
     const detectedIds = new Set(allDetectedGames.map(g => g.id))
 
     const keptGames = nonCustomGames.filter(g => detectedIds.has(g.id))
@@ -236,6 +248,15 @@ ipcMain.handle('scan-games', async (event) => {
     const removedGames = nonCustomGames.filter(g => !detectedIds.has(g.id))
     if (removedGames.length > 0) {
       log.info(`Removing ${removedGames.length} uninstalled games: ${removedGames.map(g => g.name).join(', ')}`)
+      for (const game of removedGames) {
+        const coversPath = path.join(app.getPath('userData'), 'config', 'covers', game.id)
+        try {
+          await fsPromises.rm(coversPath, { recursive: true, force: true })
+          log.info('Deleted covers folder for uninstalled game:', game.name)
+        } catch (err) {
+          log.warn('Failed to delete covers folder for game:', game.name, err)
+        }
+      }
     }
 
     const newGames = allDetectedGames.filter(g => !existingIds.has(g.id))
@@ -277,6 +298,15 @@ ipcMain.handle('add-game', async (_, game: Omit<GameInfo, 'id'>) => {
 
 ipcMain.handle('remove-game', async (_, gameId: string) => {
   log.info('IPC: remove-game called', gameId)
+
+  const coversPath = path.join(app.getPath('userData'), 'config', 'covers', gameId)
+  try {
+    await fsPromises.rm(coversPath, { recursive: true, force: true })
+    log.info('Deleted covers folder:', coversPath)
+  } catch (err) {
+    log.warn('Failed to delete covers folder:', err)
+  }
+
   const games = store.get('games') as GameInfo[]
   const filtered = games.filter(g => g.id !== gameId)
   store.set('games', filtered)
@@ -310,6 +340,16 @@ ipcMain.handle('launch-store', async (_, storeName: string) => {
       } else {
         log.warn('Epic Games not found')
         return { success: false, message: 'Epic Games not installed' }
+      }
+    } else if (storeName === 'ea') {
+      const { getEAInstallPath } = await import('./getEAGames')
+      const eaPath = await getEAInstallPath()
+      if (eaPath) {
+        log.info(`Launching EA App: ${eaPath}`)
+        exec(`"${eaPath}"`)
+      } else {
+        log.warn('EA App not found')
+        return { success: false, message: 'EA App not installed' }
       }
     } else {
       log.warn(`Unknown store: ${storeName}`)
@@ -350,6 +390,10 @@ ipcMain.handle('launch-game', async (_, game: GameInfo) => {
         : game.executablePath
       log.info(`Launching Epic game via: ${epicUrl}`)
       await shell.openExternal(epicUrl)
+    } else if (game.store === 'ea' || game.executablePath.startsWith('origin2://')) {
+      const eaUrl = game.executablePath
+      log.info(`Launching EA game via: ${eaUrl}`)
+      await shell.openExternal(eaUrl)
     } else {
       await shell.openPath(game.executablePath)
     }
@@ -440,14 +484,15 @@ ipcMain.handle('refresh-store-paths', async () => {
 })
 
 ipcMain.handle('get-store-paths', async () => {
-  const settings = store.get('settings') as { gameClients?: { steam?: string | null; epic?: string | null } }
+  const settings = store.get('settings') as { gameClients?: { steam?: string | null; epic?: string | null; ea?: string | null } }
   return {
     steamPath: settings?.gameClients?.steam || null,
-    epicPath: settings?.gameClients?.epic || null
+    epicPath: settings?.gameClients?.epic || null,
+    eaPath: settings?.gameClients?.ea || null
   }
 })
 
-ipcMain.handle('save-settings', async (_, settings: { theme: string; scanOnStartup: boolean; hardwareAcceleration: boolean }) => {
+ipcMain.handle('save-settings', async (_, settings: Settings) => {
   const currentSettings = store.get('settings') as Record<string, unknown>
   store.set('settings', {
     ...currentSettings,
@@ -597,6 +642,111 @@ ipcMain.handle('fetch-changelog', async () => {
   } catch (error) {
     log.error('Error fetching changelog:', error)
     return { content: '', error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('search-steamgriddb', async (_, query: string) => {
+  log.info('IPC: search-steamgriddb called', query)
+  if (!isClientInitialized()) {
+    return { error: 'SteamGridDB API key not configured. You can set your API key in the settings.' }
+  }
+  try {
+    const games = await searchSteamGridDB(query)
+    return { games, error: undefined }
+  } catch (error) {
+    log.error('Error searching SteamGridDB:', error)
+    return { games: [], error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('get-steamgriddb-grids', async (_, gameId: number) => {
+  log.info('IPC: get-steamgriddb-grids called', gameId)
+  if (!isClientInitialized()) {
+    return { grids: [], error: 'SteamGridDB API key not configured' }
+  }
+  try {
+    const grids = await getSteamGridDBGrids(gameId)
+    log.info('Returning grids to frontend, count:', grids.length, 'first thumb:', grids[0]?.thumb)
+    return { grids, error: undefined }
+  } catch (error) {
+    log.error('Error getting SteamGridDB grids:', error)
+    return { grids: [], error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('get-steamgriddb-grids-by-appid', async (_, appId: string) => {
+  log.info('IPC: get-steamgriddb-grids-by-appid called', appId)
+  if (!isClientInitialized()) {
+    return { grids: [], error: 'SteamGridDB API key not configured' }
+  }
+  try {
+    const grids = await getSteamGridDBGridsBySteamAppId(appId)
+    return { grids, error: undefined }
+  } catch (error) {
+    log.error('Error getting SteamGridDB grids by appid:', error)
+    return { grids: [], error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('download-steamgriddb-cover', async (_, gridUrl: string, gameId: string) => {
+  log.info('IPC: download-steamgriddb-cover called', gameId)
+  try {
+    const coverPath = await downloadSteamGridDBCover(gridUrl, gameId, app.getPath('userData'))
+    return { path: coverPath, error: undefined }
+  } catch (error) {
+    log.error('Error downloading SteamGridDB cover:', error)
+    return { path: '', error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('init-steamgriddb', async (_, apiKey: string) => {
+  log.info('IPC: init-steamgriddb called')
+  try {
+    initSteamGridDB(apiKey)
+    
+    const isValid = await validateSteamGridDBKey()
+    if (!isValid) {
+      return { success: false, error: 'Invalid API key' }
+    }
+    
+    return { success: true }
+  } catch (error: any) {
+    log.error('Error initializing SteamGridDB:', error?.message || error)
+    initSteamGridDB('')
+    if (error?.message === 'INVALID_API_KEY' || error?.message?.includes('401') || error?.message?.includes('403') || error?.message?.includes('Unauthorized') || error?.message?.includes('Forbidden')) {
+      return { success: false, error: 'Invalid API key' }
+    }
+    return { success: false, error: error.message || 'Failed to validate API key' }
+  }
+})
+
+ipcMain.handle('check-steamgriddb-status', async () => {
+  return { initialized: isClientInitialized() }
+})
+
+ipcMain.handle('validate-steamgriddb-key', async () => {
+  log.info('IPC: validate-steamgriddb-key called')
+  try {
+    const isValid = await validateSteamGridDBKey()
+    if (isValid) {
+      return { success: true }
+    } else {
+      return { success: false, error: 'Invalid API key' }
+    }
+  } catch (error: any) {
+    log.error('Error validating SteamGridDB key:', error?.message || error)
+    return { success: false, error: error?.message || 'Failed to validate API key' }
+  }
+})
+
+ipcMain.handle('open-external', async (_, url: string) => {
+  log.info('IPC: open-external called', url)
+  try {
+    await shell.openExternal(url)
+    return { success: true }
+  } catch (error) {
+    log.error('Error opening external URL:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
   }
 })
 

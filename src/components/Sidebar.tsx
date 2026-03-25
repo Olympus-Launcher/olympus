@@ -1,7 +1,9 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { ViewType } from '../types'
-import { project, labels, ThemeMode, themes } from '../config'
+import { project, ThemeMode, themes } from '../config'
 import { sidebarIcons } from '../config/sidebarIcons'
+import { Tooltip } from './Tooltip'
 
 interface SidebarProps {
   currentView: ViewType
@@ -11,27 +13,29 @@ interface SidebarProps {
   storesFound?: {
     steam: boolean
     epic: boolean
+    ea: boolean
   }
   onLaunchStore?: (storeName: string) => void
 }
 
 export default function Sidebar({ currentView, onViewChange, gameCounts, theme, storesFound, onLaunchStore }: SidebarProps) {
+  const { t } = useTranslation()
   const themeColors = themes[theme]
   
   const baseMenuItems: { id: ViewType; label: string; icon: React.ReactNode }[] = [
     {
       id: 'all',
-      label: labels.sidebar.allGames,
+      label: t('sidebar.allGames'),
       icon: sidebarIcons.all
     },
     {
       id: 'favorites',
-      label: labels.sidebar.favorites,
+      label: t('sidebar.favorites'),
       icon: sidebarIcons.favorites
     },
     {
       id: 'recent',
-      label: labels.sidebar.recentlyPlayed,
+      label: t('sidebar.recentlyPlayed'),
       icon: sidebarIcons.recent
     }
   ]
@@ -47,9 +51,14 @@ export default function Sidebar({ currentView, onViewChange, gameCounts, theme, 
       label: project.supportedStoreNames.epic,
       icon: sidebarIcons.epic
     }] : []),
+    ...(storesFound?.ea ? [{
+      id: 'ea' as ViewType,
+      label: project.supportedStoreNames.ea,
+      icon: sidebarIcons.ea
+    }] : []),
     {
       id: 'custom' as ViewType,
-      label: project.supportedStoreNames.custom,
+      label: t('sidebar.customGamesTab'),
       icon: sidebarIcons.custom
     }
   ]
@@ -100,35 +109,48 @@ export default function Sidebar({ currentView, onViewChange, gameCounts, theme, 
         </nav>
 
         {/* Store Launch Buttons Section */}
-        {onLaunchStore && (storesFound?.steam || storesFound?.epic) && (
+        {onLaunchStore && (storesFound?.steam || storesFound?.epic || storesFound?.ea) && (
           <div className="p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="h-px bg-theme-border flex-1"></div>
               <span className="text-xs font-medium px-2" style={{ color: themeColors.textSecondary }}>
-                Clients
+                {t('sidebar.foundClients')}
               </span>
               <div className="h-px bg-theme-border flex-1"></div>
             </div>
             <div className="flex justify-center gap-2">
               {storesFound?.steam && (
-                <button
-                  onClick={() => onLaunchStore('steam')}
-                  className="p-2 rounded-lg hover:bg-theme-border transition-colors flex items-center justify-center"
-                  style={{ color: themeColors.textSecondary }}
-                  title={`Open ${project.supportedStoreNames.steam}`}
-                >
-                  <span className="text-base">{sidebarIcons.steam}</span>
-                </button>
+                <Tooltip text={t('sidebar.openSteam')}>
+                  <button
+                    onClick={() => onLaunchStore('steam')}
+                    className="p-2 rounded-lg hover:bg-theme-border transition-colors flex items-center justify-center"
+                    style={{ color: themeColors.textSecondary }}
+                  >
+                    <span className="text-base">{sidebarIcons.steam}</span>
+                  </button>
+                </Tooltip>
               )}
               {storesFound?.epic && (
-                <button
-                  onClick={() => onLaunchStore('epic')}
-                  className="p-2 rounded-lg hover:bg-theme-border transition-colors flex items-center justify-center"
-                  style={{ color: themeColors.textSecondary }}
-                  title={`Open ${project.supportedStoreNames.epic}`}
-                >
-                  <span className="text-base">{sidebarIcons.epic}</span>
-                </button>
+                <Tooltip text={t('sidebar.openEpicGames')}>
+                  <button
+                    onClick={() => onLaunchStore('epic')}
+                    className="p-2 rounded-lg hover:bg-theme-border transition-colors flex items-center justify-center"
+                    style={{ color: themeColors.textSecondary }}
+                  >
+                    <span className="text-base">{sidebarIcons.epic}</span>
+                  </button>
+                </Tooltip>
+              )}
+              {storesFound?.ea && (
+                <Tooltip text={t('sidebar.openEA')}>
+                  <button
+                    onClick={() => onLaunchStore('ea')}
+                    className="p-2 rounded-lg hover:bg-theme-border transition-colors flex items-center justify-center"
+                    style={{ color: themeColors.textSecondary }}
+                  >
+                    <span className="text-base">{sidebarIcons.ea}</span>
+                  </button>
+                </Tooltip>
               )}
             </div>
           </div>
@@ -136,7 +158,7 @@ export default function Sidebar({ currentView, onViewChange, gameCounts, theme, 
 
       <div className="p-4 border-t" style={{ borderColor: themeColors.border }}>
         <p className="text-xs text-center" style={{ color: themeColors.textSecondary }}>
-          {project.name} {labels.app.version}{project.version}
+          {project.name} {t('app.version')}{project.version}
         </p>
       </div>
     </aside>

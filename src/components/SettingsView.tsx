@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Settings, GameInfo } from '../types'
-import { project, labels, themesList, ThemeMode, themes } from '../config'
+import { project, themesList, ThemeMode, themes } from '../config'
 import logoBigUrl from '../assets/logo-big.png'
+import i18n from '../i18n'
 
-type SettingsTab = 'library' | 'appearance' | 'hidden' | 'about'
+type SettingsTab = 'application' | 'hidden' | 'about' | 'integrations'
 
 interface SettingsViewProps {
   settings: Settings
@@ -14,16 +16,30 @@ interface SettingsViewProps {
 }
 
 export default function SettingsView({ settings, onSave, onScanGames, isScanning, onRefreshGames }: SettingsViewProps) {
+  const { t } = useTranslation()
   const [localSettings, setLocalSettings] = useState<Settings>(settings)
   const [themeDropdownOpen, setThemeDropdownOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<SettingsTab>('library')
+  const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false)
+  
+  const currentLanguage = i18n.language || 'en'
+  
+  const languages = Object.keys(i18n.options.resources || {}).map(lang => ({
+    code: lang,
+    name: t(`settings.tabs.application.languageDropdown.${lang}`, lang)
+  }))
+  const [activeTab, setActiveTab] = useState<SettingsTab>('application')
   const [hiddenGames, setHiddenGames] = useState<GameInfo[]>([])
   const [updateStatus, setUpdateStatus] = useState<{ status: string; version?: string; percent?: number; error?: string } | null>(null)
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false)
   const [showRestartMessage, setShowRestartMessage] = useState(false)
+  const [isTestingConnection, setIsTestingConnection] = useState(false)
+  const [connectionTestResult, setConnectionTestResult] = useState<{ success: boolean; message: string } | null>(null)
+  const [apiKeyConfirmed, setApiKeyConfirmed] = useState(!!settings.integrations?.steamGridDBApiKey)
 
   useEffect(() => {
     setLocalSettings(settings)
+    const hasApiKey = !!(settings.integrations && settings.integrations.steamGridDBApiKey && settings.integrations.steamGridDBApiKey.length > 0)
+    setApiKeyConfirmed(hasApiKey)
   }, [settings])
 
   useEffect(() => {
@@ -41,10 +57,6 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
     })
     return unsubscribe
   }, [])
-
-  useEffect(() => {
-    onSave(localSettings)
-  }, [localSettings])
 
   const handleCheckForUpdates = async () => {
     setIsCheckingUpdate(true)
@@ -80,16 +92,16 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
   const currentTheme = themesList.find(t => t.id === localSettings.theme) || themesList[1]
 
   const tabs: { id: SettingsTab; label: string }[] = [
-    { id: 'library', label: labels.settings.application },
-    { id: 'hidden', label: 'Hidden' },
-    { id: 'appearance', label: labels.settings.appearance },
-    { id: 'about', label: 'About' }
+    { id: 'application', label: t('settings.tabs.application.tabLabel') },
+    { id: 'hidden', label: t('settings.tabs.hidden_games.tabLabel') },
+    { id: 'integrations', label: t('settings.tabs.integrations.tabLabel') },
+    { id: 'about', label: t('settings.tabs.about.tabLabel') }
   ]
 
   return (
     <div className="flex-1 overflow-y-auto p-6" style={{ backgroundColor: themeColors.bg }}>
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-semibold mb-6" style={{ color: themeColors.text }}>{labels.settings.title}</h1>
+        <h1 className="text-2xl font-semibold mb-6" style={{ color: themeColors.text }}>{t('settings.title')}</h1>
 
         <div className="flex border-b mb-6" style={{ borderColor: themeColors.border }}>
           {tabs.map((tab) => (
@@ -109,38 +121,40 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
           ))}
         </div>
 
-        {activeTab === 'library' && (
+        {activeTab === 'application' && (
           <div className="space-y-6">
             <div className="rounded-xl p-6" style={{ backgroundColor: themeColors.card, border: `1px solid ${themeColors.border}` }}>
-              <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>{labels.settings.library}</h2>
-              
+              <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>{t('settings.tabs.application.library')}</h2>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium" style={{ color: themeColors.text }}>{labels.settings.scanOnStartup}</p>
-                    <p className="text-sm" style={{ color: themeColors.textSecondary }}>{labels.settings.scanOnStartupDescription}</p>
+                    <p className="font-medium" style={{ color: themeColors.text }}>{t('settings.tabs.application.scanOnStartup')}</p>
+                    <p className="text-sm" style={{ color: themeColors.textSecondary }}>{t('settings.tabs.application.scanOnStartupDescription')}</p>
                   </div>
                   <button
                     onClick={() => {
-                      setLocalSettings({ ...localSettings, scanOnStartup: !localSettings.scanOnStartup })
+                      const newSettings = { ...localSettings, scanOnStartup: !localSettings.scanOnStartup }
+                      setLocalSettings(newSettings)
+                      onSave(newSettings)
                     }}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
+                    className={`relative inline-flex w-11 h-6 flex-shrink-0 rounded-full transition-colors cursor-pointer ${
                       localSettings.scanOnStartup ? 'bg-primary-600' : ''
                     }`}
                     style={{ backgroundColor: localSettings.scanOnStartup ? undefined : themeColors.border }}
+                    type="button"
                   >
-                    <span 
-                      className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                        localSettings.scanOnStartup ? 'left-7' : 'left-1'
+                    <span
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
+                        localSettings.scanOnStartup ? 'translate-x-5' : 'translate-x-0'
                       }`}
                     />
                   </button>
                 </div>
 
-                <div className="pt-4 border-t" style={{ borderColor: themeColors.border }}>
-                  <p className="font-medium mb-2" style={{ color: themeColors.text }}>{labels.settings.manualScan}</p>
-                  <p className="text-sm mb-4" style={{ color: themeColors.textSecondary }}>
-                    {labels.settings.manualScanDescription}
+                <div>
+                  <p className="font-medium mb-2" style={{ color: themeColors.text }}>{t('settings.tabs.application.manualScan')}</p>
+                  <p className="text-sm mb-3" style={{ color: themeColors.textSecondary }}>
+                    {t('settings.tabs.application.manualScanDescription')}
                   </p>
                   <button
                     onClick={onScanGames}
@@ -149,15 +163,18 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                   >
                     {isScanning ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        {labels.gameGrid.scanning}
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        {t('gameGrid.scanning')}
                       </>
                     ) : (
                       <>
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        {labels.gameGrid.scanForGames}
+                        {t('gameGrid.scanForGames')}
                       </>
                     )}
                   </button>
@@ -166,99 +183,64 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
             </div>
 
             <div className="rounded-xl p-6" style={{ backgroundColor: themeColors.card, border: `1px solid ${themeColors.border}` }}>
-              <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>{labels.settings.application}</h2>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium" style={{ color: themeColors.text }}>{labels.settings.hardwareAcceleration}</p>
-                    <p className="text-sm" style={{ color: themeColors.textSecondary }}>{labels.settings.hardwareAccelerationDescription}</p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      const newValue = !localSettings.hardwareAcceleration
-                      setLocalSettings({ ...localSettings, hardwareAcceleration: newValue })
-                      setShowRestartMessage(true)
-                    }}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      localSettings.hardwareAcceleration ? 'bg-primary-600' : ''
-                    }`}
-                    style={{ backgroundColor: localSettings.hardwareAcceleration ? undefined : themeColors.border }}
-                  >
-                    <span 
-                      className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                        localSettings.hardwareAcceleration ? 'left-7' : 'left-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-                {showRestartMessage && (
-                  <div className="p-3 rounded-lg bg-yellow-500/20 border border-yellow-500/50 flex items-center justify-between">
-                    <p className="text-sm" style={{ color: themeColors.text }}>Restart required for changes to take effect</p>
-                    <button
-                      onClick={() => window.electronAPI.restartApp()}
-                      className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-sm rounded-lg transition-colors"
-                    >
-                      Restart Now
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'hidden' && (
-          <div className="space-y-4">
-            <div className="rounded-xl p-6" style={{ backgroundColor: themeColors.card, border: `1px solid ${themeColors.border}` }}>
-              <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>Hidden Games</h2>
-              
-              {hiddenGames.length === 0 ? (
-                <p style={{ color: themeColors.textSecondary }}>No hidden games</p>
-              ) : (
-                <div className="space-y-2">
-                  {hiddenGames.map((game) => (
-                    <div 
-                      key={game.id}
-                      className="flex items-center justify-between p-3 rounded-lg"
-                      style={{ backgroundColor: themeColors.surface }}
-                    >
-                      <div className="flex items-center gap-3">
-                        {game.coverImage ? (
-                          <img src={`file://${game.coverImage}`} alt={game.name} className="w-10 h-14 object-cover rounded" />
-                        ) : (
-                          <div className="w-10 h-14 rounded flex items-center justify-center" style={{ backgroundColor: themeColors.border }}>
-                            <span className="text-lg font-bold" style={{ color: themeColors.textSecondary }}>{(game.name || '?').charAt(0).toUpperCase()}</span>
-                          </div>
-                        )}
-                        <div>
-                          <p className="font-medium" style={{ color: themeColors.text }}>{game.name}</p>
-                          <p className="text-xs" style={{ color: themeColors.textSecondary }}>{game.store}</p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleUnhideGame(game.id)}
-                        className="px-3 py-1 text-sm rounded-lg bg-primary-600 hover:bg-primary-700 text-white transition-colors"
-                      >
-                        Unhide
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'appearance' && (
-          <div className="space-y-6">
-            <div className="rounded-xl p-6" style={{ backgroundColor: themeColors.card, border: `1px solid ${themeColors.border}` }}>
-              <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>{labels.settings.appearance}</h2>
-              
+              <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>{t('settings.tabs.application.appearance')}</h2>
               <div className="space-y-4">
                 <div>
-                  <p className="font-medium mb-1" style={{ color: themeColors.text }}>{labels.settings.theme}</p>
-                  <p className="text-sm mb-3" style={{ color: themeColors.textSecondary }}>{labels.settings.themeDescription}</p>
+                  <p className="font-medium mb-1" style={{ color: themeColors.text }}>{t('settings.tabs.application.language')}</p>
+                  <p className="text-sm mb-3" style={{ color: themeColors.textSecondary }}>{t('settings.tabs.application.languageDescription')}</p>
+                  
+                  <div className="relative">
+                    <button
+                      onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors"
+                      style={{ 
+                        backgroundColor: themeColors.surface, 
+                        border: `1px solid ${themeColors.border}`,
+                        color: themeColors.text 
+                      }}
+                    >
+                      <span>{t(`settings.tabs.application.languageDropdown.${currentLanguage}`)}</span>
+                      <svg className={`w-5 h-5 transition-transform ${languageDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    
+                    {languageDropdownOpen && (
+                      <div className="absolute top-full left-0 right-0 mt-1 rounded-lg shadow-xl z-10 overflow-hidden" style={{ backgroundColor: themeColors.surface, border: `1px solid ${themeColors.border}` }}>
+                        {languages.map((lang) => (
+                          <button
+                            key={lang.code}
+                            onClick={() => {
+                              i18n.changeLanguage(lang.code)
+                              const newSettings = { ...localSettings, language: lang.code }
+                              setLocalSettings(newSettings)
+                              onSave(newSettings)
+                              setLanguageDropdownOpen(false)
+                            }}
+                            className="w-full flex items-center justify-between px-4 py-3 text-left transition-colors"
+                            style={{ 
+                              backgroundColor: currentLanguage === lang.code ? '#0284c7' : undefined,
+                              color: currentLanguage === lang.code ? 'white' : themeColors.text 
+                            }}
+                          >
+                            <span>{lang.name}</span>
+                            {currentLanguage === lang.code && (
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="h-px my-4" style={{ backgroundColor: themeColors.border }} />
+
+                <div>
+                  <p className="font-medium mb-1" style={{ color: themeColors.text }}>{t('settings.tabs.application.theme')}</p>
+                  <p className="text-sm mb-3" style={{ color: themeColors.textSecondary }}>{t('settings.tabs.application.themeDescription')}</p>
                   
                   <div className="relative">
                     <button
@@ -299,8 +281,202 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                       </div>
                     )}
                   </div>
+
+                  <div className="h-px my-4" style={{ backgroundColor: themeColors.border }} />
+
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium" style={{ color: themeColors.text }}>{t('settings.tabs.application.showStoreOnGameCard')}</p>
+                      <p className="text-sm" style={{ color: themeColors.textSecondary }}>{t('settings.tabs.application.showStoreOnGameCardDescription')}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const newValue = localSettings.showStoreOnGameCard === false
+                        const newSettings = { ...localSettings, showStoreOnGameCard: newValue }
+                        setLocalSettings(newSettings)
+                        onSave(newSettings)
+                      }}
+                      className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${localSettings.showStoreOnGameCard === false ? '' : 'bg-primary-600'}`}
+                      style={{ backgroundColor: localSettings.showStoreOnGameCard === false ? themeColors.border : undefined }}
+                    >
+                      <span
+                        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${localSettings.showStoreOnGameCard === false ? 'translate-x-0' : 'translate-x-5'}`}
+                      />
+                    </button>
+                  </div>
                 </div>
               </div>
+            </div>
+
+            <div className="rounded-xl p-6" style={{ backgroundColor: themeColors.card, border: `1px solid ${themeColors.border}` }}>
+              <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>{t('settings.tabs.application.application')}</h2>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium" style={{ color: themeColors.text }}>{t('settings.tabs.application.hardwareAcceleration')}</p>
+                    <p className="text-sm" style={{ color: themeColors.textSecondary }}>{t('settings.tabs.application.hardwareAccelerationDescription')}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const newValue = !localSettings.hardwareAcceleration
+                      const newSettings = { ...localSettings, hardwareAcceleration: newValue }
+                      setLocalSettings(newSettings)
+                      onSave(newSettings)
+                      setShowRestartMessage(true)
+                    }}
+                    className={`relative inline-flex w-11 h-6 flex-shrink-0 rounded-full transition-colors cursor-pointer ${
+                      localSettings.hardwareAcceleration ? 'bg-primary-600' : ''
+                    }`}
+                    style={{ backgroundColor: localSettings.hardwareAcceleration ? undefined : themeColors.border }}
+                    type="button"
+                  >
+                    <span 
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
+                        localSettings.hardwareAcceleration ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+                {showRestartMessage && (
+                  <div className="p-3 rounded-lg bg-yellow-500/20 border border-yellow-500/50 flex items-center justify-between">
+                    <p className="text-sm" style={{ color: themeColors.text }}>{t('settings.restartToApply')}</p>
+                    <button
+                      onClick={() => window.electronAPI.restartApp()}
+                      className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-sm rounded-lg transition-colors"
+                    >
+                      {t('settings.restartNow')}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'integrations' && (
+          <div className="space-y-4">
+            <div className="rounded-xl p-6" style={{ backgroundColor: themeColors.card, border: `1px solid ${themeColors.border}` }}>
+              <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>{t('settings.tabs.integrations.steamGridDB')}</h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <p className="font-medium mb-2" style={{ color: themeColors.text }}>{t('settings.tabs.integrations.steamGridDBSubtitle')}</p>
+                  {!apiKeyConfirmed ? (
+                    <>
+                      <p className="text-sm mb-3" style={{ color: themeColors.textSecondary }}>
+                        {t('settings.tabs.integrations.steamGridDBDescription')}{' '}
+                        <button
+                          onClick={() => window.electronAPI.openExternal('https://www.steamgriddb.com/profile/preferences/api')}
+                          className="text-primary-400 hover:text-primary-300 underline"
+                        >
+                          {t('settings.tabs.integrations.apiKeyFrom')}
+                        </button>
+                      </p>
+                      <div className="flex gap-2">
+                        <input
+                          type="password"
+                          value={localSettings.integrations?.steamGridDBApiKey || ''}
+                          onChange={(e) => {
+                            const newSettings = { ...localSettings, integrations: { ...localSettings.integrations, steamGridDBApiKey: e.target.value } }
+                            setLocalSettings(newSettings)
+                            setConnectionTestResult(null)
+                            setApiKeyConfirmed(false)
+                          }}
+                          placeholder={t('settings.tabs.integrations.apiKeyPlaceholder')}
+                          className="flex-1 px-4 py-2 bg-theme-bg border border-theme-border rounded-lg text-theme-text"
+                        />
+                        <button
+                          onClick={async () => {
+                            if (!localSettings.integrations?.steamGridDBApiKey) return
+                            setIsTestingConnection(true)
+                            setConnectionTestResult(null)
+                            
+                            const result = await window.electronAPI.initSteamGridDB(localSettings.integrations.steamGridDBApiKey)
+                            
+                            if (result.success) {
+                              setConnectionTestResult({ success: true, message: t('settings.tabs.integrations.apiKeyValid') })
+                              setApiKeyConfirmed(true)
+                              onSave(localSettings)
+                            } else {
+                              setConnectionTestResult({ success: false, message: t('settings.tabs.integrations.apiKeyInvalid') })
+                              setApiKeyConfirmed(false)
+                            }
+                            setIsTestingConnection(false)
+                          }}
+                          disabled={!localSettings.integrations?.steamGridDBApiKey || isTestingConnection}
+                          className="px-4 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-600/50 text-white rounded-lg transition-colors"
+                        >
+                          {isTestingConnection ? t('settings.tabs.integrations.testing') : t('settings.tabs.integrations.testConnection')}
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <p className="text-green-400">{t('settings.tabs.integrations.apiKeyConfigured')}</p>
+                      <button
+                        onClick={() => {
+                          const newSettings = { ...localSettings, integrations: { ...localSettings.integrations, steamGridDBApiKey: '' } }
+                          setLocalSettings(newSettings)
+                          setApiKeyConfirmed(false)
+                          setConnectionTestResult(null)
+                          onSave(newSettings)
+                        }}
+                        className="text-primary-400 hover:text-primary-300 underline text-sm"
+                      >
+                        {t('settings.tabs.integrations.removeApiKey')}
+                      </button>
+                    </div>
+                  )}
+                  {connectionTestResult && !apiKeyConfirmed && (
+                    <p className={`mt-2 text-sm ${connectionTestResult.success ? 'text-green-400' : 'text-red-400'}`}>
+                      {connectionTestResult.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'hidden' && (
+          <div className="space-y-4">
+            <div className="rounded-xl p-6" style={{ backgroundColor: themeColors.card, border: `1px solid ${themeColors.border}` }}>
+              <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>{t('settings.tabs.hidden_games.hidden_games')}</h2>
+              
+              {hiddenGames.length === 0 ? (
+                <p style={{ color: themeColors.textSecondary }}>{t('settings.tabs.hidden_games.noHiddenGames')}</p>
+              ) : (
+                <div className="space-y-2">
+                  {hiddenGames.map((game) => (
+                    <div 
+                      key={game.id}
+                      className="flex items-center justify-between p-3 rounded-lg"
+                      style={{ backgroundColor: themeColors.surface }}
+                    >
+                      <div className="flex items-center gap-3">
+                        {game.coverImage ? (
+                          <img src={`file://${game.coverImage}`} alt={game.name} className="w-10 h-14 object-cover rounded" />
+                        ) : (
+                          <div className="w-10 h-14 rounded flex items-center justify-center" style={{ backgroundColor: themeColors.border }}>
+                            <span className="text-lg font-bold" style={{ color: themeColors.textSecondary }}>{(game.name || '?').charAt(0).toUpperCase()}</span>
+                          </div>
+                        )}
+                        <div>
+                          <p className="font-medium" style={{ color: themeColors.text }}>{game.name}</p>
+                          <p className="text-xs" style={{ color: themeColors.textSecondary }}>{game.store}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleUnhideGame(game.id)}
+                        className="px-3 py-1 text-sm rounded-lg bg-primary-600 hover:bg-primary-700 text-white transition-colors"
+                      >
+                        {t('settings.tabs.hidden_games.unhide')}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -308,32 +484,32 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
         {activeTab === 'about' && (
           <div className="space-y-6">
             <div className="rounded-xl p-6" style={{ backgroundColor: themeColors.card, border: `1px solid ${themeColors.border}` }}>
-              <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>About</h2>
+              <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>{t('settings.tabs.about.about')}</h2>
               
               <div className="space-y-3" style={{ color: themeColors.textSecondary }}>
                 <p className="text-2xl font-bold text-center" style={{ color: themeColors.text }}>{project.name}</p>
-                <p className="text-center">Version {project.version}</p>
+                <p className="text-center">{t('settings.tabs.about.version')} {project.version}</p>
                 <div className="flex justify-center py-4">
                   <img src={logoBigUrl} alt="Logo" className="h-40 w-auto object-contain" draggable="false" />
                 </div>
-                <p>{project.description}<br></br><br></br>
-                  <span>This app is in early development.</span><br></br>
-                  <span>Feel free to give your feedback, we're always open for suggestions/ideas!</span>
+                <p>{t('app.description')}<br></br><br></br>
+                  <span>{t('settings.tabs.about.aboutText')}</span><br></br>
                 </p>
                 <div className="flex justify-end pt-1">
-                  <span style={{fontSize: "14px"}}>From Portugal with ❤️</span>
+                  <span style={{fontSize: "14px"}}>{t('settings.tabs.about.withLove')}</span>
                 </div>
               </div>
             </div>
 
             <div className="rounded-xl p-6" style={{ backgroundColor: themeColors.card, border: `1px solid ${themeColors.border}` }}>
-              <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>Updates</h2>
-
+              <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.text }}>{t('settings.tabs.about.update')}</h2>
+              <p style={{ color: themeColors.textSecondary }}>{t('settings.tabs.about.updateAreaDescription')}</p>
+              <br></br>
               <div className="space-y-4">
                 {updateStatus?.status === 'checking' || isCheckingUpdate ? (
                   <div className="flex items-center gap-3" style={{ color: themeColors.textSecondary }}>
                     <div className="w-5 h-5 border-2 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
-                    <span>Checking for updates...</span>
+                    <span>{t('update.checkingUpdates')}</span>
                   </div>
                 ) : updateStatus?.status === 'available' ? (
                   <div className="space-y-3">
@@ -341,7 +517,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                       <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
-                      <span>Update {updateStatus.version} is available</span>
+                      <span>{t('update.updateAvailable', { version: updateStatus.version })}</span>
                     </div>
                     <button
                       onClick={handleDownloadUpdate}
@@ -350,14 +526,14 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
-                      Download & Install
+                      {t('update.updateAvailableButton')}
                     </button>
                   </div>
                 ) : updateStatus?.status === 'downloading' ? (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2" style={{ color: themeColors.textSecondary }}>
                       <div className="w-5 h-5 border-2 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
-                      <span>Downloading update... {Math.round(updateStatus.percent || 0)}%</span>
+                      <span>{t('update.downloadingUpdate', { percent: Math.round(updateStatus.percent || 0) })}%</span>
                     </div>
                     <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: themeColors.border }}>
                       <div 
@@ -372,7 +548,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                       <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span>Update {updateStatus.version} is ready to install</span>
+                      <span>{t('update.updateReadyToInstall', { version: updateStatus.version })}</span>
                     </div>
                     <button
                       onClick={handleInstallUpdate}
@@ -381,7 +557,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                       </svg>
-                      Restart & Install
+                      {t('update.updateReadyToInstallButton')}
                     </button>
                   </div>
                 ) : updateStatus?.status === 'not-available' ? (
@@ -389,7 +565,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span>You're running the latest version</span>
+                    <span>{t('update.latestVersion')}</span>
                   </div>
                 ) : updateStatus?.status === 'error' ? (
                   <div className="space-y-3">
@@ -397,13 +573,13 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span>Error: {updateStatus.error}</span>
+                      <span>{t('settings.tabs.about.error')}: {updateStatus.error}</span>
                     </div>
                     <button
                       onClick={handleCheckForUpdates}
                       className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
                     >
-                      Try Again
+                      {t('update.updateTryAgain')}
                     </button>
                   </div>
                 ) : (
@@ -414,7 +590,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    Check for Updates
+                    {t('settings.tabs.about.checkUpdatesButton')}
                   </button>
                 )}
               </div>

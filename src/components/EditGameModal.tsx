@@ -1,19 +1,30 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { GameInfo } from '../types'
-import { project, labels } from '../config'
+import { ThemeMode } from '../config'
+import SteamGridDBModal from './SteamGridDBModal'
+import { Tooltip } from './Tooltip'
 
 interface EditGameModalProps {
   game: GameInfo
+  theme: ThemeMode
   onClose: () => void
   onSave: (game: GameInfo) => void
 }
 
-export default function EditGameModal({ game, onClose, onSave }: EditGameModalProps) {
+export default function EditGameModal({ game, theme, onClose, onSave }: EditGameModalProps) {
+  const { t } = useTranslation()
   const [name, setName] = useState(game.name)
   const [executablePath, setExecutablePath] = useState(game.executablePath)
   const [coverImage, setCoverImage] = useState(game.coverImage || '')
-  const [store, setStore] = useState(game.store)
   const [isLoading, setIsLoading] = useState(false)
+  const [showSteamGridDB, setShowSteamGridDB] = useState(false)
+
+  const isStoreGame = game.store === 'steam' || game.store === 'epic' || game.store === 'ea'
+
+  const handleCoverSelected = (coverPath: string) => {
+    setCoverImage(coverPath)
+  }
 
   const handleSelectExecutable = async () => {
     const path = await window.electronAPI.selectExecutable()
@@ -33,17 +44,23 @@ export default function EditGameModal({ game, onClose, onSave }: EditGameModalPr
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name || !executablePath) return
+    if (!isStoreGame && (!name || !executablePath)) return
 
     setIsLoading(true)
     try {
-      onSave({
-        ...game,
-        name,
-        executablePath,
-        coverImage: coverImage || undefined,
-        store
-      })
+      if (isStoreGame) {
+        onSave({
+          ...game,
+          coverImage: coverImage || undefined
+        })
+      } else {
+        onSave({
+          ...game,
+          name,
+          executablePath,
+          coverImage: coverImage || undefined
+        })
+      }
     } finally {
       setIsLoading(false)
     }
@@ -51,9 +68,9 @@ export default function EditGameModal({ game, onClose, onSave }: EditGameModalPr
 
   return (
     <div className="fixed inset-0 bg-black/70 modal-overlay flex items-center justify-center z-50">
-      <div className="bg-theme-surface border border-theme-border rounded-2xl w-full max-w-md mx-4 overflow-hidden fade-in">
+      <div className="bg-theme-surface border border-theme-border rounded-2xl w-full max-w-xl mx-4 overflow-hidden fade-in">
         <div className="flex items-center justify-between px-6 py-4 border-b border-theme-border">
-          <h2 className="text-lg font-semibold text-theme-text">Edit Game</h2>
+          <h2 className="text-lg font-semibold text-theme-text">{t('editGame.title')}</h2>
           <button
             onClick={onClose}
             className="p-1 text-theme-textSecondary hover:text-theme-text transition-colors"
@@ -67,42 +84,46 @@ export default function EditGameModal({ game, onClose, onSave }: EditGameModalPr
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-theme-textSecondary mb-2">
-              Game Name *
+              {t('editGame.gameName')}
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-2 bg-theme-bg border border-theme-border rounded-lg text-theme-text"
+              disabled={isStoreGame}
+              className={`w-full px-4 py-2 bg-theme-bg border border-theme-border rounded-lg text-theme-text ${isStoreGame ? 'opacity-50 cursor-not-allowed' : ''}`}
               required
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-theme-textSecondary mb-2">
-              Executable Path *
+              {t('editGame.executablePath')}
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={executablePath}
                 onChange={(e) => setExecutablePath(e.target.value)}
-                className="flex-1 px-4 py-2 bg-theme-bg border border-theme-border rounded-lg text-theme-text"
+                disabled={isStoreGame}
+                className={`flex-1 px-4 py-2 bg-theme-bg border border-theme-border rounded-lg text-theme-text ${isStoreGame ? 'opacity-50 cursor-not-allowed' : ''}`}
                 required
               />
-              <button
-                type="button"
-                onClick={handleSelectExecutable}
-                className="px-4 py-2 bg-theme-card border border-theme-border rounded-lg text-theme-text hover:bg-theme-border transition-colors"
-              >
-                {labels.addGame.browse}
-              </button>
+              {!isStoreGame && (
+                <button
+                  type="button"
+                  onClick={handleSelectExecutable}
+                  className="px-4 py-2 bg-theme-card border border-theme-border rounded-lg text-theme-text hover:bg-theme-border transition-colors"
+                >
+                  {t('editGame.browse')}
+                </button>
+              )}
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-theme-textSecondary mb-2">
-              Cover Image
+              {t('editGame.coverImage')}
             </label>
             <div className="flex gap-2">
               <input
@@ -116,42 +137,36 @@ export default function EditGameModal({ game, onClose, onSave }: EditGameModalPr
                 onClick={handleSelectImage}
                 className="px-4 py-2 bg-theme-card border border-theme-border rounded-lg text-theme-text hover:bg-theme-border transition-colors"
               >
-                {labels.addGame.browse}
+                {t('editGame.browse')}
               </button>
+              <Tooltip text={t('editGame.steamGridDBTooltip')}>
+              <button
+                type="button"
+                onClick={() => setShowSteamGridDB(true)}
+                className="px-4 py-2 bg-theme-card border border-theme-border rounded-lg text-primary-500 hover:bg-theme-border transition-colors"
+              >
+                {t('editGame.steamGridDB')}
+              </button>
+              </Tooltip>
             </div>
           </div>
 
           {coverImage && (
             <div className="flex justify-center">
               <img 
-                src={`file://${coverImage}`} 
+                src={`file://${coverImage}?t=${Date.now()}`} 
                 alt="Cover preview" 
                 className="h-32 rounded-lg object-cover"
+                key={coverImage}
               />
             </div>
           )}
 
-          <div>
-            <label className="block text-sm font-medium text-theme-textSecondary mb-2">
-              Store / Source
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              {project.supportedStores.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setStore(s)}
-                  className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                    store === s
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-theme-card text-theme-textSecondary hover:bg-theme-border'
-                  }`}
-                >
-                  {project.supportedStoreNames[s]}
-                </button>
-              ))}
-            </div>
-          </div>
+          {isStoreGame && (
+            <p className="text-xs text-theme-textSecondary italic">
+              {t('editGame.onlyCoverEditable', { store: game.store })}
+            </p>
+          )}
 
           <div className="flex gap-3 pt-4">
             <button
@@ -159,18 +174,29 @@ export default function EditGameModal({ game, onClose, onSave }: EditGameModalPr
               onClick={onClose}
               className="flex-1 py-2 bg-theme-card border border-theme-border rounded-lg text-theme-text hover:bg-theme-border transition-colors"
             >
-              {labels.addGame.cancel}
+              {t('addGame.cancel')}
             </button>
             <button
               type="submit"
-              disabled={isLoading || !name || !executablePath}
+              disabled={isLoading}
               className="flex-1 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-600/50 text-white rounded-lg transition-colors"
             >
-              {isLoading ? 'Saving...' : 'Save'}
+              {t('addGame.save')}
             </button>
           </div>
         </form>
       </div>
+
+      {showSteamGridDB && (
+        <SteamGridDBModal
+          gameName={name}
+          gameId={game.id}
+          steamAppId={game.store === 'steam' ? game.appid : undefined}
+          theme={theme}
+          onClose={() => setShowSteamGridDB(false)}
+          onCoverSelected={handleCoverSelected}
+        />
+      )}
     </div>
   )
 }

@@ -39,8 +39,8 @@ interface Window {
     saveGameCover: (gameId: string, imagePath: string) => Promise<string>
     getSettings: () => Promise<import('./types').Settings>
     saveSettings: (settings: import('./types').Settings) => Promise<boolean>
-    refreshStorePaths: () => Promise<{ steam: string | null; epic: string | null }>
-    getStorePaths: () => Promise<{ steamPath: string | null; epicPath: string | null }>
+    refreshStorePaths: () => Promise<{ steam: string | null; epic: string | null; ea: string | null }>
+    getStorePaths: () => Promise<{ steamPath: string | null; epicPath: string | null; eaPath: string | null }>
     getFavorites: () => Promise<string[]>
     saveFavorites: (favoriteIds: string[]) => Promise<boolean>
     toggleFavorite: (gameId: string) => Promise<string[]>
@@ -56,5 +56,13 @@ interface Window {
     onScanProgress: (callback: (progress: ScanProgress) => void) => () => void
     onUpdateStatus: (callback: (status: UpdateStatus) => void) => () => void
     fetchChangelog: () => Promise<{ content: string; error?: string }>
+    searchSteamGridDB: (query: string) => Promise<{ games: { id: number; name: string; types: string[]; verified: boolean }[]; error?: string }>
+    getSteamGridDBGrids: (gameId: number) => Promise<{ grids: { id: number; url: string; thumb: string; style: string; dimensions: string; likes: number }[]; error?: string }>
+    getSteamGridDBGridsByAppId: (appId: string) => Promise<{ grids: { id: number; url: string; thumb: string; style: string; dimensions: string; likes: number }[]; error?: string }>
+    downloadSteamGridDBCover: (gridUrl: string, gameId: string) => Promise<{ path: string; error?: string }>
+    initSteamGridDB: (apiKey: string) => Promise<{ success: boolean; error?: string }>
+    validateSteamGridDBKey: () => Promise<{ success: boolean; error?: string }>
+    checkSteamGridDBStatus: () => Promise<{ initialized: boolean }>
+    openExternal: (url: string) => Promise<{ success: boolean; error?: string }>
   }
 }
