@@ -68,7 +68,17 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "headerImage": "build/headerImage.bmp",
+      "sidebarImage": "build/sidebarImage.bmp",
+      "license": "build/license.txt",
+      "shortcutName": "Olympus",
+      "deleteAppDataOnUninstall": true
     },
     "publish": {
       "provider": "github",
