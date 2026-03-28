@@ -155,6 +155,11 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                   <div>
                     <p className="font-medium" style={{ color: themeColors.text }}>{t('settings.tabs.application.autoDownloadCovers')}</p>
                     <p className="text-sm" style={{ color: themeColors.textSecondary }}>{t('settings.tabs.application.autoDownloadCoversDescription')}</p>
+                    {localSettings.autoDownloadCovers && !localSettings.integrations?.steamGridDBApiKey && (
+                      <p className="text-sm mt-1" style={{ color: '#f59e0b' }}>
+                        {t('settings.tabs.application.autoDownloadCoversWarning')}
+                      </p>
+                    )}
                   </div>
                   <button
                     onClick={() => {

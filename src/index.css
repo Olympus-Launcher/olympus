@@ -12,6 +12,16 @@
   -webkit-user-select: none;
 }
 
+*:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+*:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 /* Hardware acceleration optimizations */
 html, body {
   will-change: transform;
@@ -155,10 +165,12 @@ input[type="search"] {
   outline: none;
 }
 
-input[type="text"]:focus,
-input[type="search"]:focus {
-  border-color: #0ea5e9;
-  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+button:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .modal-overlay {
