@@ -4,7 +4,7 @@
   <img src="https://raw.githubusercontent.com/miguel-apereira/Olympus-Frontend/refs/heads/main/public/logo-big.png" alt="Olympus Frontend Logo" width="250"/>
 </p>
 
-<h1 align="center">Olympus Frontend</h1>
+<h1 align="center">Olympus</h1>
 
 <p align="center">
   <em>As the Greek gods lived on Mount Olympus, so shall your games.</em>
@@ -19,8 +19,9 @@
 <!-- BADGES -->
 <p align="center">
   <img src="https://img.shields.io/github/v/release/miguel-apereira/Olympus-Frontend?style=for-the-badge" />
-  <img src="https://img.shields.io/github/downloads/miguel-apereira/Olympus-Frontend/total?style=for-the-badge&label=Total%20Downloads&color=%239173bd" />
-  <img src="https://img.shields.io/github/stars/miguel-apereira/Olympus-Frontend?style=for-the-badge" />
+  <img src="https://img.shields.io/github/stars/miguel-apereira/Olympus-Frontend?style=for-the-badge" /><br>
+  <img alt="GitHub Downloads (specific asset, all releases)" src="https://img.shields.io/github/downloads/Olympus-Launcher/olympus/Olympus-Setup.exe?displayAssetName=false&style=for-the-badge&label=Total%20Downloads%20(Setup)&color=%23007EC6">
+  <img alt="GitHub Downloads (specific asset, all releases)" src="https://img.shields.io/github/downloads/Olympus-Launcher/olympus/Olympus-Portable.zip?displayAssetName=false&style=for-the-badge&label=Total%20Downloads%20(Portable)&color=%23007EC6">
 </p>
 
 <br/>
