@@ -27,7 +27,7 @@ export interface Settings {
   }
 }
 
-export type ViewType = 'all' | 'favorites' | 'recent' | 'steam' | 'epic' | 'ea' | 'custom' | 'settings'
+export type ViewType = 'all' | 'favorites' | 'recent' | 'steam' | 'epic' | 'ea' | 'custom' | 'settings' | 'game-detail'
 
 export interface UpdateStatus {
   status: 'checking' | 'available' | 'not-available' | 'downloading' | 'downloaded' | 'error' | 'dev-mode'

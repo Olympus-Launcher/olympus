@@ -227,6 +227,16 @@
     "verified": "Verified",
     "skip": "Skip",
     "noApiKey": "No SteamGridDB API key configured. Please add one in Settings to enable automatic cover downloads."
+  },
+
+  "gameDetail": {
+    "back": "Back",
+    "playGame": "Play Game",
+    "editGame": "Edit",
+    "gameInfo": "Game Info",
+    "lastPlayed": "Last Played",
+    "playCount": "Times Played",
+    "store": "Store"
   }
 
 }

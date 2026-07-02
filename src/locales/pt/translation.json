@@ -226,6 +226,16 @@
     "verified": "Verificado",
     "skip": "Saltar",
     "noApiKey": "Chave API SteamGridDB não configurada. Por favor, adiciona uma nas Definições para ativar a descarga automática de capas."
+  },
+
+  "gameDetail": {
+    "back": "Voltar",
+    "playGame": "Jogar",
+    "editGame": "Editar",
+    "gameInfo": "Informação do Jogo",
+    "lastPlayed": "Última vez jogado",
+    "playCount": "Vezes jogado",
+    "store": "Loja"
   }
 
 }

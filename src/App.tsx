@@ -10,6 +10,7 @@ import EditGameModal from './components/EditGameModal'
 import ChangelogModal from './components/ChangelogModal'
 import WebView from './components/WebView'
 import AutoCoverModal, { GameSelectionModal } from './components/AutoCoverModal'
+import GameDetailView from './components/GameDetailView'
 import { TooltipProvider } from './components/Tooltip'
 import { GameInfo, ViewType, Settings } from './types'
 import { themes } from './config'
@@ -50,6 +51,8 @@ function App() {
   const [showAutoCoverModal, setShowAutoCoverModal] = useState(false)
   const [needsSelection, setNeedsSelection] = useState<{ gameId: string; gameName: string; matches: { id: number; name: string; verified: boolean }[] } | null>(null)
   const [coverDownloadStatus, setCoverDownloadStatus] = useState<{ isDownloading: boolean; gameName: string } | null>(null)
+  const [selectedGame, setSelectedGame] = useState<GameInfo | null>(null)
+  const [previousView, setPreviousView] = useState<ViewType>('all')
   const { t } = useTranslation()
   const themeColors = themes[settings.theme]
 
@@ -279,6 +282,17 @@ function App() {
     }
   }
 
+  const handleGameSelect = (game: GameInfo) => {
+    setPreviousView(currentView)
+    setSelectedGame(game)
+    setCurrentView('game-detail')
+  }
+
+  const handleBackFromGameDetail = () => {
+    setSelectedGame(null)
+    setCurrentView(previousView)
+  }
+
   const handleLaunchStore = async (storeName: string) => {
     try {
       const result = await window.electronAPI.launchStore(storeName)
@@ -389,6 +403,9 @@ function App() {
   const handleViewChange = (view: ViewType) => {
     setCurrentView(view)
     setSearchQuery('')
+    if (view !== 'game-detail') {
+      setSelectedGame(null)
+    }
   }
 
   const appStyle = {
@@ -520,6 +537,15 @@ function App() {
                 setGames(games)
               }}
             />
+          ) : currentView === 'game-detail' && selectedGame ? (
+            <GameDetailView
+              game={selectedGame}
+              themeColors={themeColors}
+              onBack={handleBackFromGameDetail}
+              onLaunch={handleLaunchGame}
+              onEdit={setEditingGame}
+              onToggleFavorite={handleToggleFavorite}
+            />
           ) : (
             <>
               <header 
@@ -586,6 +612,7 @@ function App() {
                 onUnhide={handleUnhideGame}
                 onToggleFavorite={handleToggleFavorite}
                 onEdit={setEditingGame}
+                onViewGame={handleGameSelect}
                 isEmpty={filteredGames.length === 0}
                 isScanning={isScanning}
                 onScan={handleManualScan}
