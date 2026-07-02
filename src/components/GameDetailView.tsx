@@ -160,14 +160,8 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
                 </svg>
               </button>
             </div>
-          </div>
-        </div>
 
-        {hasBanner && (
-        <div className="flex flex-col md:flex-row gap-8" style={{ marginTop: '2rem' }}>
-          <div className="w-full md:w-72 flex-shrink-0" style={{ marginLeft: '2rem' }} />
-          <div className="flex-1">
-            <div className="space-y-4 mb-8">
+            <div className="space-y-4 mt-6 mb-8">
               <div className="p-4 rounded-xl" style={{ backgroundColor: themeColors.surface, border: `1px solid ${themeColors.border}` }}>
                 <h3 className="text-sm font-medium mb-3" style={{ color: themeColors.textSecondary }}>
                   {t('gameDetail.gameInfo')}
@@ -223,69 +217,6 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
             </div>
           </div>
         </div>
-        )}
-
-        {!hasBanner && (
-        <div className="flex flex-col md:flex-row gap-8" style={{ marginTop: '1rem', alignItems: 'flex-start' }}>
-          <div className="w-full md:w-72 flex-shrink-0" style={{ marginLeft: '2rem' }} />
-          <div className="flex-1">
-            <div className="space-y-4 mb-8">
-              <div className="p-4 rounded-xl" style={{ backgroundColor: themeColors.surface, border: `1px solid ${themeColors.border}` }}>
-                <h3 className="text-sm font-medium mb-3" style={{ color: themeColors.textSecondary }}>
-                  {t('gameDetail.gameInfo')}
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span style={{ color: themeColors.textSecondary }}>{t('gameDetail.lastPlayed')}</span>
-                    <span style={{ color: themeColors.text }}>{formatLastPlayed(game.lastPlayed)}</span>
-                  </div>
-                  {game.playCount !== undefined && game.playCount > 0 && (
-                    <div className="flex justify-between">
-                      <span style={{ color: themeColors.textSecondary }}>{t('gameDetail.playCount')}</span>
-                      <span style={{ color: themeColors.text }}>{game.playCount}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <span style={{ color: themeColors.textSecondary }}>{t('gameDetail.store')}</span>
-                    <span style={{ color: themeColors.text }}>{storeDisplayName(game.store)}</span>
-                  </div>
-                  {game.appid && (
-                    <div className="flex justify-between">
-                      <span style={{ color: themeColors.textSecondary }}>App ID</span>
-                      <span style={{ color: themeColors.text }}>{game.appid}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={handleLaunch}
-                className="flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors font-medium"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-                {t('gameDetail.playGame')}
-              </button>
-              <button
-                onClick={handleEdit}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg transition-colors font-medium"
-                style={{
-                  backgroundColor: themeColors.surface,
-                  border: `1px solid ${themeColors.border}`,
-                  color: themeColors.text
-                }}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                {t('gameDetail.editGame')}
-              </button>
-            </div>
-          </div>
-        </div>
-        )}
       </div>
     </div>
   )
