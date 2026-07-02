@@ -17,13 +17,18 @@ export default function EditGameModal({ game, theme, onClose, onSave }: EditGame
   const [name, setName] = useState(game.name)
   const [executablePath, setExecutablePath] = useState(game.executablePath)
   const [coverImage, setCoverImage] = useState(game.coverImage || '')
+  const [bannerImage, setBannerImage] = useState(game.bannerImage || '')
   const [isLoading, setIsLoading] = useState(false)
-  const [showSteamGridDB, setShowSteamGridDB] = useState(false)
+  const [showSteamGridDB, setShowSteamGridDB] = useState<'cover' | 'hero' | false>(false)
 
   const isStoreGame = game.store === 'steam' || game.store === 'epic' || game.store === 'ea'
 
   const handleCoverSelected = (coverPath: string) => {
     setCoverImage(coverPath)
+  }
+
+  const handleBannerSelected = (bannerPath: string) => {
+    setBannerImage(bannerPath)
   }
 
   const handleSelectExecutable = async () => {
@@ -42,6 +47,13 @@ export default function EditGameModal({ game, theme, onClose, onSave }: EditGame
     }
   }
 
+  const handleSelectBannerImage = async () => {
+    const path = await window.electronAPI.selectImage()
+    if (path) {
+      setBannerImage(path)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!isStoreGame && (!name || !executablePath)) return
@@ -51,14 +63,16 @@ export default function EditGameModal({ game, theme, onClose, onSave }: EditGame
       if (isStoreGame) {
         onSave({
           ...game,
-          coverImage: coverImage || undefined
+          coverImage: coverImage || undefined,
+          bannerImage: bannerImage || undefined
         })
       } else {
         onSave({
           ...game,
           name,
           executablePath,
-          coverImage: coverImage || undefined
+          coverImage: coverImage || undefined,
+          bannerImage: bannerImage || undefined
         })
       }
     } finally {
@@ -110,13 +124,13 @@ export default function EditGameModal({ game, theme, onClose, onSave }: EditGame
                 required
               />
               {!isStoreGame && (
-                <button
-                  type="button"
-                  onClick={handleSelectExecutable}
-                  className="px-4 py-2 bg-theme-card border border-theme-border rounded-lg text-theme-text hover:bg-theme-border transition-colors"
-                >
-                  {t('editGame.browse')}
-                </button>
+              <button
+                type="button"
+                onClick={handleSelectExecutable}
+                className="px-4 py-2 bg-theme-card border border-theme-border rounded-lg text-theme-text hover:bg-theme-border transition-colors"
+              >
+                {t('editGame.browse')}
+              </button>
               )}
             </div>
           </div>
@@ -142,7 +156,7 @@ export default function EditGameModal({ game, theme, onClose, onSave }: EditGame
               <Tooltip text={t('editGame.steamGridDBTooltip')}>
               <button
                 type="button"
-                onClick={() => setShowSteamGridDB(true)}
+                onClick={() => setShowSteamGridDB('cover')}
                 className="px-4 py-2 bg-theme-card border border-theme-border rounded-lg text-primary-500 hover:bg-theme-border transition-colors"
               >
                 {t('editGame.steamGridDB')}
@@ -158,6 +172,47 @@ export default function EditGameModal({ game, theme, onClose, onSave }: EditGame
                 alt="Cover preview" 
                 className="h-32 rounded-lg object-cover"
                 key={coverImage}
+              />
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-theme-textSecondary mb-2">
+              {t('editGame.bannerImage')}
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={bannerImage}
+                onChange={(e) => setBannerImage(e.target.value)}
+                className="flex-1 px-4 py-2 bg-theme-bg border border-theme-border rounded-lg text-theme-text"
+              />
+              <button
+                type="button"
+                onClick={handleSelectBannerImage}
+                className="px-4 py-2 bg-theme-card border border-theme-border rounded-lg text-theme-text hover:bg-theme-border transition-colors"
+              >
+                {t('editGame.browse')}
+              </button>
+              <Tooltip text={t('editGame.steamGridDBBannerTooltip')}>
+              <button
+                type="button"
+                onClick={() => setShowSteamGridDB('hero')}
+                className="px-4 py-2 bg-theme-card border border-theme-border rounded-lg text-primary-500 hover:bg-theme-border transition-colors"
+              >
+                {t('editGame.steamGridDB')}
+              </button>
+              </Tooltip>
+            </div>
+          </div>
+
+          {bannerImage && (
+            <div className="flex justify-center">
+              <img 
+                src={`file://${bannerImage}?t=${Date.now()}`} 
+                alt="Banner preview" 
+                className="h-24 rounded-lg object-cover w-full max-w-xl"
+                key={bannerImage}
               />
             </div>
           )}
@@ -187,14 +242,27 @@ export default function EditGameModal({ game, theme, onClose, onSave }: EditGame
         </form>
       </div>
 
-      {showSteamGridDB && (
+      {showSteamGridDB === 'cover' && (
         <SteamGridDBModal
           gameName={name}
           gameId={game.id}
           steamAppId={game.store === 'steam' ? game.appid : undefined}
           theme={theme}
+          imageType="cover"
           onClose={() => setShowSteamGridDB(false)}
           onCoverSelected={handleCoverSelected}
+        />
+      )}
+
+      {showSteamGridDB === 'hero' && (
+        <SteamGridDBModal
+          gameName={name}
+          gameId={game.id}
+          steamAppId={game.store === 'steam' ? game.appid : undefined}
+          theme={theme}
+          imageType="hero"
+          onClose={() => setShowSteamGridDB(false)}
+          onCoverSelected={handleBannerSelected}
         />
       )}
     </div>

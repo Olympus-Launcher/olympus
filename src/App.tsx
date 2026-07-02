@@ -273,9 +273,20 @@ function App() {
         }
       }
       
-      const finalGame = { ...updatedGame, coverImage }
+      let bannerImage = updatedGame.bannerImage
+      if (bannerImage && !bannerImage.includes('covers') && !bannerImage.startsWith('file://')) {
+        try {
+          const savedPath = await window.electronAPI.saveGameBanner(updatedGame.id, bannerImage)
+          bannerImage = savedPath
+        } catch (error) {
+          console.error('Error copying banner:', error)
+        }
+      }
+      
+      const finalGame = { ...updatedGame, coverImage, bannerImage }
       await window.electronAPI.saveGames(games.map(g => g.id === updatedGame.id ? finalGame : g))
       setGames(prev => prev.map(g => g.id === updatedGame.id ? finalGame : g))
+      setSelectedGame(prev => prev?.id === updatedGame.id ? finalGame : prev)
       setEditingGame(null)
     } catch (error) {
       console.error('Error editing game:', error)
@@ -332,6 +343,9 @@ function App() {
         isFavorite: favoriteSet.has(g.id)
       }))
       setGames(updatedGames)
+      if (selectedGame && selectedGame.id === gameId) {
+        setSelectedGame({ ...selectedGame, isFavorite: favoriteSet.has(gameId) })
+      }
     } catch (error) {
       console.error('Error toggling favorite:', error)
     }

@@ -17,7 +17,10 @@ import {
   searchSteamGridDB, 
   getSteamGridDBGrids, 
   getSteamGridDBGridsBySteamAppId,
+  getSteamGridDBHeroes,
+  getSteamGridDBHeroesBySteamAppId,
   downloadSteamGridDBCover,
+  downloadSteamGridDBHero,
   isExactMatch,
   isClientInitialized,
   validateSteamGridDBKey
@@ -823,6 +826,63 @@ ipcMain.handle('download-steamgriddb-cover', async (_, gridUrl: string, gameId: 
   } catch (error) {
     log.error('Error downloading SteamGridDB cover:', error)
     return { path: '', error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('get-steamgriddb-heroes', async (_, gameId: number) => {
+  log.info('IPC: get-steamgriddb-heroes called', gameId)
+  if (!isClientInitialized()) {
+    return { grids: [], error: 'SteamGridDB API key not configured' }
+  }
+  try {
+    const grids = await getSteamGridDBHeroes(gameId)
+    return { grids, error: undefined }
+  } catch (error) {
+    log.error('Error getting SteamGridDB heroes:', error)
+    return { grids: [], error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('get-steamgriddb-heroes-by-appid', async (_, appId: string) => {
+  log.info('IPC: get-steamgriddb-heroes-by-appid called', appId)
+  if (!isClientInitialized()) {
+    return { grids: [], error: 'SteamGridDB API key not configured' }
+  }
+  try {
+    const grids = await getSteamGridDBHeroesBySteamAppId(appId)
+    return { grids, error: undefined }
+  } catch (error) {
+    log.error('Error getting SteamGridDB heroes by appid:', error)
+    return { grids: [], error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('download-steamgriddb-hero', async (_, gridUrl: string, gameId: string) => {
+  log.info('IPC: download-steamgriddb-hero called', gameId)
+  try {
+    const heroPath = await downloadSteamGridDBHero(gridUrl, gameId, app.getPath('userData'))
+    return { path: heroPath, error: undefined }
+  } catch (error) {
+    log.error('Error downloading SteamGridDB hero:', error)
+    return { path: '', error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+ipcMain.handle('save-game-banner', async (_, gameId: string, imagePath: string) => {
+  log.info('IPC: save-game-banner called', gameId, imagePath)
+  try {
+    const coversDir = path.join(app.getPath('userData'), 'config', 'covers', gameId)
+    if (!fs.existsSync(coversDir)) {
+      fs.mkdirSync(coversDir, { recursive: true })
+    }
+    const ext = path.extname(imagePath) || '.png'
+    const destPath = path.join(coversDir, `banner${ext}`)
+    fs.copyFileSync(imagePath, destPath)
+    log.info('Banner copied to:', destPath)
+    return destPath
+  } catch (error) {
+    log.error('Error saving banner:', error)
+    throw error
   }
 })
 

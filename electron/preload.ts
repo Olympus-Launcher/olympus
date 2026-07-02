@@ -5,6 +5,7 @@ export interface GameInfo {
   name: string
   executablePath: string
   coverImage?: string
+  bannerImage?: string
   store: 'steam' | 'epic' | 'custom'
   installLocation?: string
   lastPlayed?: string
@@ -94,6 +95,9 @@ interface ElectronAPI {
   getSteamGridDBGrids: (gameId: number) => Promise<{ grids: SteamGridDBGrid[]; error?: string }>
   getSteamGridDBGridsByAppId: (appId: string) => Promise<{ grids: SteamGridDBGrid[]; error?: string }>
   downloadSteamGridDBCover: (gridUrl: string, gameId: string) => Promise<{ path: string; error?: string }>
+  getSteamGridDBHeroes: (gameId: number) => Promise<{ grids: SteamGridDBGrid[]; error?: string }>
+  getSteamGridDBHeroesByAppId: (appId: string) => Promise<{ grids: SteamGridDBGrid[]; error?: string }>
+  downloadSteamGridDBHero: (gridUrl: string, gameId: string) => Promise<{ path: string; error?: string }>
   initSteamGridDB: (apiKey: string) => Promise<{ success: boolean; error?: string }>
   validateSteamGridDBKey: () => Promise<{ success: boolean; error?: string }>
   checkSteamGridDBStatus: () => Promise<{ initialized: boolean }>
@@ -117,8 +121,8 @@ const electronAPI: ElectronAPI = {
   selectExecutable: (): Promise<string | null> => ipcRenderer.invoke('select-executable'),
   selectImage: (): Promise<string | null> => ipcRenderer.invoke('select-image'),
   saveGameCover: (gameId: string, imagePath: string): Promise<string> => ipcRenderer.invoke('save-game-cover', gameId, imagePath),
+  saveGameBanner: (gameId: string, imagePath: string): Promise<string> => ipcRenderer.invoke('save-game-banner', gameId, imagePath),
   getSettings: (): Promise<Settings> => ipcRenderer.invoke('get-settings'),
-  saveSettings: (settings: Settings): Promise<boolean> => ipcRenderer.invoke('save-settings', settings),
   refreshStorePaths: (): Promise<{ steam: string | null; epic: string | null; ea: string | null }> => ipcRenderer.invoke('refresh-store-paths'),
   getStorePaths: (): Promise<{ steamPath: string | null; epicPath: string | null; eaPath: string | null }> => ipcRenderer.invoke('get-store-paths'),
   getFavorites: (): Promise<string[]> => ipcRenderer.invoke('get-favorites'),
@@ -148,6 +152,9 @@ const electronAPI: ElectronAPI = {
   getSteamGridDBGrids: (gameId: number): Promise<{ grids: SteamGridDBGrid[]; error?: string }> => ipcRenderer.invoke('get-steamgriddb-grids', gameId),
   getSteamGridDBGridsByAppId: (appId: string): Promise<{ grids: SteamGridDBGrid[]; error?: string }> => ipcRenderer.invoke('get-steamgriddb-grids-by-appid', appId),
   downloadSteamGridDBCover: (gridUrl: string, gameId: string): Promise<{ path: string; error?: string }> => ipcRenderer.invoke('download-steamgriddb-cover', gridUrl, gameId),
+  getSteamGridDBHeroes: (gameId: number): Promise<{ grids: SteamGridDBGrid[]; error?: string }> => ipcRenderer.invoke('get-steamgriddb-heroes', gameId),
+  getSteamGridDBHeroesByAppId: (appId: string): Promise<{ grids: SteamGridDBGrid[]; error?: string }> => ipcRenderer.invoke('get-steamgriddb-heroes-by-appid', appId),
+  downloadSteamGridDBHero: (gridUrl: string, gameId: string): Promise<{ path: string; error?: string }> => ipcRenderer.invoke('download-steamgriddb-hero', gridUrl, gameId),
   initSteamGridDB: (apiKey: string): Promise<{ success: boolean; error?: string }> => ipcRenderer.invoke('init-steamgriddb', apiKey),
   validateSteamGridDBKey: (): Promise<{ success: boolean; error?: string }> => ipcRenderer.invoke('validate-steamgriddb-key'),
   checkSteamGridDBStatus: (): Promise<{ initialized: boolean }> => ipcRenderer.invoke('check-steamgriddb-status'),

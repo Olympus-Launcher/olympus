@@ -155,6 +155,67 @@ export async function getSteamGridDBGridsBySteamAppId(appId: string): Promise<St
   }
 }
 
+export async function getSteamGridDBHeroes(gameId: number): Promise<SteamGridDBGrid[]> {
+  if (!client) {
+    log.warn('SteamGridDB client not initialized')
+    return []
+  }
+
+  try {
+    const heroes = await client.getHeroes({
+      type: 'game',
+      id: gameId
+    } as any)
+    log.info('Raw heroes count:', heroes.length)
+
+    const mapped = (heroes as unknown as any[]).map((g: any) => {
+      const url = typeof g.url === 'string' ? g.url : String(g.url || '')
+      const thumb = typeof g.thumb === 'string' ? g.thumb : String(g.thumb || url)
+      return {
+        id: g.id,
+        url,
+        thumb,
+        style: g.style || '',
+        dimensions: `${g.width || 0}x${g.height || 0}`,
+        likes: g.upvotes || 0
+      }
+    })
+    return mapped.sort((a, b) => b.likes - a.likes)
+  } catch (error) {
+    log.error('Error getting SteamGridDB heroes:', error)
+    throw error
+  }
+}
+
+export async function getSteamGridDBHeroesBySteamAppId(appId: string): Promise<SteamGridDBGrid[]> {
+  if (!client) {
+    log.warn('SteamGridDB client not initialized')
+    return []
+  }
+
+  try {
+    const heroes = await client.getHeroesBySteamAppId(Number(appId))
+    log.info('Raw heroes by appid count:', heroes.length)
+
+    const mapped = (heroes as unknown as any[]).map((g: any) => {
+      const url = typeof g.url === 'string' ? g.url : String(g.url || '')
+      const thumb = typeof g.thumb === 'string' ? g.thumb : String(g.thumb || url)
+      return {
+        id: g.id,
+        url,
+        thumb,
+        style: g.style || '',
+        dimensions: `${g.width || 0}x${g.height || 0}`,
+        likes: g.upvotes || 0
+      }
+    })
+    return mapped.sort((a, b) => b.likes - a.likes)
+  } catch (error) {
+    log.error('Error getting SteamGridDB heroes by appid:', error)
+    throw error
+  }
+}
+
 export async function downloadSteamGridDBCover(
   gridUrl: string,
   gameId: string,
@@ -188,4 +249,35 @@ export async function downloadSteamGridDBCover(
 
 export function isExactMatch(gameName: string, searchResultName: string): boolean {
   return gameName.toLowerCase().trim() === searchResultName.toLowerCase().trim()
+}
+
+export async function downloadSteamGridDBHero(
+  gridUrl: string,
+  gameId: string,
+  userDataPath: string
+): Promise<string> {
+  try {
+    const coversDir = path.join(userDataPath, 'config', 'covers', gameId)
+    await fsPromises.mkdir(coversDir, { recursive: true })
+
+    const ext = gridUrl.includes('.gif') ? '.gif' : 
+                 gridUrl.includes('.webp') ? '.webp' :
+                 gridUrl.includes('.jpg') ? '.jpg' : '.png'
+    const destPath = path.join(coversDir, `banner${ext}`)
+
+    const response = await fetch(gridUrl)
+    if (!response.ok) {
+      throw new Error(`Failed to download image: ${response.statusText}`)
+    }
+
+    const arrayBuffer = await response.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+    await fsPromises.writeFile(destPath, buffer)
+
+    log.info('Hero downloaded to:', destPath)
+    return destPath
+  } catch (error) {
+    log.error('Error downloading SteamGridDB hero:', error)
+    throw error
+  }
 }

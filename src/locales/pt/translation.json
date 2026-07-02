@@ -90,10 +90,12 @@
     "gameName": "Nome do Jogo",
     "executablePath": "Caminho do Executável (.exe)",
     "coverImage": "Imagem de Capa",
+    "bannerImage": "Imagem de Banner",
     "onlyCoverEditable": "Apenas a capa do jogo pode ser alterada para jogos da {{store}}.",
     "browse": "Procurar",
     "steamGridDB": "SteamGridDB",
-    "steamGridDBTooltip": "Fazer download de através do SteamGridDB"
+    "steamGridDBTooltip": "Fazer download de através do SteamGridDB",
+    "steamGridDBBannerTooltip": "Fazer download de banner através do SteamGridDB"
   },
 
   "settings": {
@@ -171,15 +173,19 @@
 
   "steamGridDB": {
     "title": "Fazer download de capa através do SteamGridDB",
+    "heroTitle": "Fazer download de banner através do SteamGridDB",
     "searching": "A procurar...",
     "foundMultiple": "Foram encontrados vários jogos com o nome semelhante. Escolhe o jogo correcto:",
     "chooseDifferent": "Escolher um jogo diferente",
     "selectCover": "Seleciona uma capa:",
     "noCovers": "Não foram encontradas capas para este jogo.",
+    "noHeroes": "Não foram encontrados banners para este jogo.",
     "failedToLoadCovers": "Houve um problema ao carregar capas para este jogo.",
+    "failedToLoadHeroes": "Houve um problema ao carregar banners para este jogo.",
     "gameNotFound": "O jogo que procuraste não foi encontrado.",
     "failedToSearchGames": "Houve um problema ao procurar por jogos.",
     "failedToDownloadCover": "Houve um problema ao descarregar a capa para este jogo.",
+    "failedToDownloadHero": "Houve um problema ao descarregar o banner para este jogo.",
     "tryAgain": "Tentar novamente",
     "downloading": "A descarregar...",
     "download": "Descarregar",

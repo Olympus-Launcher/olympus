@@ -37,6 +37,7 @@ interface Window {
     selectExecutable: () => Promise<string | null>
     selectImage: () => Promise<string | null>
     saveGameCover: (gameId: string, imagePath: string) => Promise<string>
+    saveGameBanner: (gameId: string, imagePath: string) => Promise<string>
     getSettings: () => Promise<import('./types').Settings>
     saveSettings: (settings: import('./types').Settings) => Promise<boolean>
     refreshStorePaths: () => Promise<{ steam: string | null; epic: string | null; ea: string | null }>
@@ -60,6 +61,9 @@ interface Window {
     getSteamGridDBGrids: (gameId: number) => Promise<{ grids: { id: number; url: string; thumb: string; style: string; dimensions: string; likes: number }[]; error?: string }>
     getSteamGridDBGridsByAppId: (appId: string) => Promise<{ grids: { id: number; url: string; thumb: string; style: string; dimensions: string; likes: number }[]; error?: string }>
     downloadSteamGridDBCover: (gridUrl: string, gameId: string) => Promise<{ path: string; error?: string }>
+    getSteamGridDBHeroes: (gameId: number) => Promise<{ grids: { id: number; url: string; thumb: string; style: string; dimensions: string; likes: number }[]; error?: string }>
+    getSteamGridDBHeroesByAppId: (appId: string) => Promise<{ grids: { id: number; url: string; thumb: string; style: string; dimensions: string; likes: number }[]; error?: string }>
+    downloadSteamGridDBHero: (gridUrl: string, gameId: string) => Promise<{ path: string; error?: string }>
     initSteamGridDB: (apiKey: string) => Promise<{ success: boolean; error?: string }>
     validateSteamGridDBKey: () => Promise<{ success: boolean; error?: string }>
     checkSteamGridDBStatus: () => Promise<{ initialized: boolean }>
