@@ -170,6 +170,28 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
                 </div>
               )}
             </div>
+            {game.store === 'steam' && steamMetadata && (
+              <div className="mt-4 space-y-2 text-xs">
+                {steamMetadata.developers?.length > 0 && (
+                  <div className="flex justify-between gap-2">
+                    <span style={{ color: themeColors.textSecondary }}>Developer</span>
+                    <span className="text-right" style={{ color: themeColors.text }}>{steamMetadata.developers.join(', ')}</span>
+                  </div>
+                )}
+                {steamMetadata.publishers?.length > 0 && (
+                  <div className="flex justify-between gap-2">
+                    <span style={{ color: themeColors.textSecondary }}>Publisher</span>
+                    <span className="text-right" style={{ color: themeColors.text }}>{steamMetadata.publishers.join(', ')}</span>
+                  </div>
+                )}
+                {steamMetadata.releaseDate && (
+                  <div className="flex justify-between gap-2">
+                    <span style={{ color: themeColors.textSecondary }}>Release Date</span>
+                    <span className="text-right" style={{ color: themeColors.text }}>{steamMetadata.releaseDate}</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex-1" style={{ paddingTop: hasBanner ? '3rem' : 0 }}>
@@ -233,7 +255,7 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                         <h3 className="text-sm font-semibold uppercase tracking-wider">
-                          {t('gameDetail.screenshots')}
+                          {t('gameDetail.screenshots')} ({screenshots.length})
                         </h3>
                       </div>
 
