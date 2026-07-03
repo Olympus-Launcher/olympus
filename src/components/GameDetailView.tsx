@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { GameInfo, SteamGameMetadata } from '../types'
 import { ThemeColors } from '../config'
@@ -22,6 +22,9 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
   const [metadataLoading, setMetadataLoading] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [showStickyBar, setShowStickyBar] = useState(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const titleRef = useRef<HTMLHeadingElement>(null)
 
   const screenshots = steamMetadata?.screenshots ?? []
   const clampedIndex = screenshots.length === 0 ? 0 : Math.min(currentIndex, screenshots.length - 1)
@@ -59,6 +62,18 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isExpanded])
 
+  useEffect(() => {
+    const el = titleRef.current
+    const scrollEl = scrollRef.current
+    if (!el || !scrollEl) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowStickyBar(!entry.isIntersecting),
+      { threshold: 0, rootMargin: '-64px 0px 0px 0px', root: scrollEl }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [game.id, game.name])
+
   const handleLaunch = () => onLaunch(game)
   const handleEdit = () => onEdit(game)
   const handleToggleFavorite = () => onToggleFavorite(game.id)
@@ -91,7 +106,39 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
   const hasCover = game.coverImage && !coverError
 
   return (
-    <div className="flex-1 overflow-y-auto" style={{ backgroundColor: themeColors.bg }}>
+    <div ref={scrollRef} className="flex-1 overflow-y-auto" style={{ backgroundColor: themeColors.bg }}>
+      <div
+        className="sticky top-0 z-50 transition-all duration-300"
+        style={{
+          transform: showStickyBar ? 'translateY(0)' : 'translateY(-100%)',
+          marginBottom: showStickyBar ? '0' : '-56px',
+          backgroundColor: showStickyBar ? themeColors.bg : 'transparent',
+          boxShadow: showStickyBar ? `0 1px 0 ${themeColors.border}` : 'none',
+        }}
+      >
+        <div className="flex items-center justify-between h-14 px-6 gap-4">
+          <button onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium flex-shrink-0 transition-all hover:opacity-80"
+            style={{ color: themeColors.textSecondary }}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            {t('gameDetail.back')}
+          </button>
+
+          <span className="font-semibold truncate text-center min-w-0 flex-1 px-4" style={{ color: themeColors.text }}>
+            {game.name}
+          </span>
+
+          <button onClick={handleLaunch} className="flex items-center gap-1.5 px-4 py-1.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium flex-shrink-0 transition-all hover:scale-105 active:scale-95">
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            {t('gameDetail.playGame')}
+          </button>
+        </div>
+      </div>
+
       {hasBanner && (
         <div className="w-full" style={{ height: '20rem' }}>
           <div className="relative h-full">
@@ -197,7 +244,7 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
           <div className="flex-1" style={{ paddingTop: hasBanner ? '3rem' : 0 }}>
             <div className="flex items-start justify-between">
               <div>
-                <h1 className="text-3xl font-bold mb-2" style={{
+                <h1 ref={titleRef} className="text-3xl font-bold mb-2" style={{
                   color: hasBanner ? '#fff' : themeColors.text,
                   textShadow: hasBanner ? '0 2px 8px rgba(0,0,0,0.8)' : 'none'
                 }}>
