@@ -51,7 +51,6 @@ function App() {
   const [showAutoCoverModal, setShowAutoCoverModal] = useState(false)
   const [needsSelection, setNeedsSelection] = useState<{ gameId: string; gameName: string; matches: { id: number; name: string; verified: boolean }[] } | null>(null)
   const [coverDownloadStatus, setCoverDownloadStatus] = useState<{ isDownloading: boolean; gameName: string } | null>(null)
-
   const [selectedGame, setSelectedGame] = useState<GameInfo | null>(null)
   const [previousView, setPreviousView] = useState<ViewType>('all')
   const { t } = useTranslation()
@@ -552,6 +551,15 @@ function App() {
                 setGames(games)
               }}
 
+            />
+          ) : currentView === 'game-detail' && selectedGame ? (
+            <GameDetailView
+              game={selectedGame}
+              themeColors={themeColors}
+              onBack={handleBackFromGameDetail}
+              onLaunch={handleLaunchGame}
+              onEdit={setEditingGame}
+              onToggleFavorite={handleToggleFavorite}
             />
           ) : currentView === 'game-detail' && selectedGame ? (
             <GameDetailView

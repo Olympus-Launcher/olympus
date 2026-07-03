@@ -26,12 +26,8 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
   const screenshots = steamMetadata?.screenshots ?? []
   const clampedIndex = screenshots.length === 0 ? 0 : Math.min(currentIndex, screenshots.length - 1)
   const currentScreenshot = screenshots[clampedIndex] ?? null
-  const CARD_W = 180
   const GAP = 12
-  const SLIDE_W = CARD_W + GAP
-  const VIEWPORT_W = 3 * CARD_W + 2 * GAP
   const leftIndex = Math.max(0, Math.min(clampedIndex - 1, Math.max(0, screenshots.length - 3)))
-  const translateX = -leftIndex * SLIDE_W
   const MAX_VISIBLE_DOTS = 5
   const dotOffset = Math.max(0, Math.min(currentIndex - 2, screenshots.length - MAX_VISIBLE_DOTS))
 
@@ -229,6 +225,88 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
 
             <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_420px] gap-6 mt-6 mb-8" style={{ alignItems: 'start' }}>
               <div className="flex flex-col gap-6">
+                {screenshots.length > 0 && (
+                  <div className="rounded-xl overflow-hidden" style={{ backgroundColor: themeColors.surface, border: `1px solid ${themeColors.border}` }}>
+                    <div className="p-5">
+                      <div className="flex items-center gap-2 mb-4" style={{ color: themeColors.textSecondary }}>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <h3 className="text-sm font-semibold uppercase tracking-wider">
+                          {t('gameDetail.screenshots')}
+                        </h3>
+                      </div>
+
+                      <div className="relative w-full aspect-[21/9] overflow-x-clip overflow-y-visible rounded-lg">
+                        <div
+                          className="flex gap-3 h-full"
+                          style={{
+                            transform: `translateX(calc(-${leftIndex} * (100% + ${GAP}px) / 3))`,
+                            transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+                          }}
+                        >
+                          {screenshots.map((url, i) => (
+                            <button
+                              key={i}
+                              onClick={() => { setCurrentIndex(i); setIsExpanded(true) }}
+                              className="flex-shrink-0 relative rounded-lg overflow-hidden transition-all duration-150 hover:scale-110 hover:z-10 hover:shadow-xl"
+                              style={{ width: `calc((100% - ${2 * GAP}px) / 3)` }}
+                            >
+                              <img
+                                src={url}
+                                alt=""
+                                className="w-full h-full object-cover"
+                                draggable={false}
+                              />
+                            </button>
+                          ))}
+                        </div>
+
+                        {clampedIndex > 0 && (
+                          <button
+                            onClick={() => setCurrentIndex(i => Math.max(0, i - 1))}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all z-10 hover:scale-110 backdrop-blur-sm"
+                            style={{ backgroundColor: 'rgba(0,0,0,0.5)', color: '#fff' }}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                          </button>
+                        )}
+
+                        {clampedIndex < screenshots.length - 1 && (
+                          <button
+                            onClick={() => setCurrentIndex(i => Math.min(screenshots.length - 1, i + 1))}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all z-10 hover:scale-110 backdrop-blur-sm"
+                            style={{ backgroundColor: 'rgba(0,0,0,0.5)', color: '#fff' }}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="flex justify-center mt-3">
+                        <div className="flex items-center gap-1.5">
+                          {screenshots.slice(dotOffset, dotOffset + MAX_VISIBLE_DOTS).map((_, idx) => {
+                            const i = dotOffset + idx
+                            return (
+                              <button key={i} onClick={() => setCurrentIndex(i)} className="flex-shrink-0 transition-all duration-200 rounded-full"
+                                style={{
+                                  width: i === currentIndex ? '16px' : '6px',
+                                  height: '6px',
+                                  backgroundColor: i === currentIndex ? 'var(--color-primary-500, #6366f1)' : 'rgba(255,255,255,0.25)',
+                                }}
+                              />
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="p-5 rounded-xl" style={{ backgroundColor: themeColors.surface, border: `1px solid ${themeColors.border}` }}>
                   <div className="flex items-center gap-2 mb-4" style={{ color: themeColors.textSecondary }}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -269,94 +347,6 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
                     </div>
                   )}
                 </div>
-
-                {screenshots.length > 0 && (
-                  <div className="rounded-xl" style={{ backgroundColor: themeColors.surface, border: `1px solid ${themeColors.border}` }}>
-                    <div className="p-5">
-                      <div className="flex items-center gap-2 mb-4" style={{ color: themeColors.textSecondary }}>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <h3 className="text-sm font-semibold uppercase tracking-wider">
-                          {t('gameDetail.screenshots')}
-                        </h3>
-                      </div>
-
-                      <div className="relative flex justify-center" style={{ height: `${Math.round(CARD_W * 9 / 16)}px` }}>
-                        <div className="relative overflow-x-clip overflow-y-visible" style={{ width: `${VIEWPORT_W}px` }}>
-                          <div
-                            className="flex"
-                            style={{
-                              transform: `translateX(${translateX}px)`,
-                              transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-                            }}
-                          >
-                            {screenshots.map((url, i) => (
-                              <button
-                                key={i}
-                                onClick={() => { setCurrentIndex(i); setIsExpanded(true) }}
-                                className="flex-shrink-0 relative rounded-lg overflow-hidden transition-all duration-150 hover:scale-110 hover:z-10 hover:shadow-xl"
-                                style={{
-                                  width: `${CARD_W}px`,
-                                  height: `${Math.round(CARD_W * 9 / 16)}px`,
-                                  marginRight: i < screenshots.length - 1 ? `${GAP}px` : '0',
-                                }}
-                              >
-                                <img
-                                  src={url}
-                                  alt=""
-                                  className="w-full h-full object-cover"
-                                  draggable={false}
-                                />
-                              </button>
-                            ))}
-                          </div>
-
-                          {clampedIndex > 0 && (
-                            <button
-                              onClick={() => setCurrentIndex(i => Math.max(0, i - 1))}
-                              className="absolute left-1 top-1/2 -translate-y-1/2 p-1.5 rounded-full transition-all z-10 hover:scale-110"
-                              style={{ backgroundColor: 'rgba(0,0,0,0.45)', color: themeColors.textSecondary }}
-                            >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                              </svg>
-                            </button>
-                          )}
-
-                          {clampedIndex < screenshots.length - 1 && (
-                            <button
-                              onClick={() => setCurrentIndex(i => Math.min(screenshots.length - 1, i + 1))}
-                              className="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 rounded-full transition-all z-10 hover:scale-110"
-                              style={{ backgroundColor: 'rgba(0,0,0,0.45)', color: themeColors.textSecondary }}
-                            >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                              </svg>
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex justify-center mt-4" style={{ height: '18px' }}>
-                        <div className="flex gap-2">
-                          {screenshots.slice(dotOffset, dotOffset + MAX_VISIBLE_DOTS).map((_, idx) => {
-                            const i = dotOffset + idx
-                            return (
-                              <button key={i} onClick={() => setCurrentIndex(i)} className="flex-shrink-0">
-                                <div className={`w-2.5 h-2.5 rounded-full transition-all duration-150 ${
-                                  i === currentIndex
-                                    ? 'bg-primary-500 scale-125'
-                                    : 'bg-white/30 hover:bg-white/50'
-                                }`} />
-                              </button>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
 
               <div className="p-5 rounded-xl" style={{ backgroundColor: themeColors.surface, border: `1px solid ${themeColors.border}`, alignSelf: 'start' }}>
