@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback, cloneElement, ReactElement } from 'react'
 import { useTranslation } from 'react-i18next'
 import { GameInfo, SteamGameMetadata } from '../types'
 import { ThemeColors } from '../config'
+import { sidebarIcons } from '../config/sidebarIcons'
 
 interface GameDetailViewProps {
   game: GameInfo
@@ -14,6 +15,12 @@ interface GameDetailViewProps {
 
 export default function GameDetailView({ game, themeColors, onBack, onLaunch, onEdit, onToggleFavorite }: GameDetailViewProps) {
   const { t } = useTranslation()
+  const storeLogos: Record<string, ReactElement> = {
+    steam: cloneElement(sidebarIcons.steam, { className: 'w-4 h-4' }),
+    epic: cloneElement(sidebarIcons.epic, { className: 'w-4 h-4' }),
+    ea: cloneElement(sidebarIcons.ea, { className: 'w-4 h-4' }),
+    custom: cloneElement(sidebarIcons.custom, { className: 'w-4 h-4' }),
+  }
   const [bannerError, setBannerError] = useState(false)
   const [coverError, setCoverError] = useState(false)
   const [reqTab, setReqTab] = useState<'minimum' | 'recommended'>('minimum')
@@ -22,17 +29,25 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
   const [metadataLoading, setMetadataLoading] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
   const [showStickyBar, setShowStickyBar] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
 
   const screenshots = steamMetadata?.screenshots ?? []
   const clampedIndex = screenshots.length === 0 ? 0 : Math.min(currentIndex, screenshots.length - 1)
-  const currentScreenshot = screenshots[clampedIndex] ?? null
   const GAP = 12
   const leftIndex = Math.max(0, Math.min(clampedIndex - 1, Math.max(0, screenshots.length - 3)))
   const MAX_VISIBLE_DOTS = 5
   const dotOffset = Math.max(0, Math.min(currentIndex - 2, screenshots.length - MAX_VISIBLE_DOTS))
+
+  const animateClose = useCallback(() => {
+    setIsClosing(true)
+    setTimeout(() => {
+      setIsExpanded(false)
+      setIsClosing(false)
+    }, 200)
+  }, [])
 
   useEffect(() => {
     setCurrentIndex(0)
@@ -54,7 +69,7 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
   useEffect(() => {
     if (!isExpanded) return
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsExpanded(false)
+      if (e.key === 'Escape') animateClose()
       if (e.key === 'ArrowLeft') setCurrentIndex(i => Math.max(0, i - 1))
       if (e.key === 'ArrowRight') setCurrentIndex(i => Math.min(screenshots.length - 1, i + 1))
     }
@@ -239,27 +254,41 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
                 )}
               </div>
             )}
+            {game.playCount !== undefined && game.playCount > 0 && (
+              <div className="mt-4 space-y-2 text-xs">
+                <div className="flex justify-between gap-2">
+                  <span style={{ color: themeColors.textSecondary }}>{t('gameDetail.playCount')}</span>
+                  <span className="text-right" style={{ color: themeColors.text }}>{game.playCount}</span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex-1" style={{ paddingTop: hasBanner ? '3rem' : 0 }}>
             <div className="flex items-start justify-between">
               <div>
-                <h1 ref={titleRef} className="text-3xl font-bold mb-2" style={{
+                <h1 ref={titleRef} className="text-3xl font-bold" style={{
                   color: hasBanner ? '#fff' : themeColors.text,
                   textShadow: hasBanner ? '0 2px 8px rgba(0,0,0,0.8)' : 'none'
                 }}>
                   {game.name}
                 </h1>
-                <span
-                  className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium"
-                  style={{
-                    backgroundColor: hasBanner ? 'rgba(0,0,0,0.4)' : themeColors.surface,
-                    border: `1px solid ${hasBanner ? 'rgba(255,255,255,0.2)' : themeColors.border}`,
-                    color: hasBanner ? '#fff' : themeColors.textSecondary
-                  }}
-                >
-                  {storeDisplayName(game.store)}
-                </span>
+                <div className="flex items-center gap-3 mt-2">
+                  <span
+                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium"
+                    style={{
+                      backgroundColor: hasBanner ? 'rgba(0,0,0,0.4)' : themeColors.surface,
+                      border: `1px solid ${hasBanner ? 'rgba(255,255,255,0.2)' : themeColors.border}`,
+                      color: hasBanner ? '#fff' : themeColors.textSecondary
+                    }}
+                  >
+                    {storeLogos[game.store]}
+                    {storeDisplayName(game.store)}
+                  </span>
+                  <span className="text-sm" style={{ color: hasBanner ? 'rgba(255,255,255,0.7)' : themeColors.textSecondary }}>
+                    {formatLastPlayed(game.lastPlayed)}
+                  </span>
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -385,34 +414,12 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
                       {t('gameDetail.gameInfo')}
                     </h3>
                   </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span style={{ color: themeColors.textSecondary }}>{t('gameDetail.lastPlayed')}</span>
-                      <span style={{ color: themeColors.text }}>{formatLastPlayed(game.lastPlayed)}</span>
-                    </div>
-                    {game.playCount !== undefined && game.playCount > 0 && (
-                      <div className="flex justify-between">
-                        <span style={{ color: themeColors.textSecondary }}>{t('gameDetail.playCount')}</span>
-                        <span style={{ color: themeColors.text }}>{game.playCount}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between">
-                      <span style={{ color: themeColors.textSecondary }}>{t('gameDetail.store')}</span>
-                      <span style={{ color: themeColors.text }}>{storeDisplayName(game.store)}</span>
-                    </div>
-                    {game.appid && (
-                      <div className="flex justify-between">
-                        <span style={{ color: themeColors.textSecondary }}>App ID</span>
-                        <span style={{ color: themeColors.text }}>{game.appid}</span>
-                      </div>
-                    )}
-                  </div>
+
 
                   {steamMetadata?.aboutTheGame && (
-                    <div className="mt-4 pt-4 border-t" style={{ borderColor: themeColors.border }}>
-                      <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: themeColors.text }}>
-                        {steamMetadata?.aboutTheGame || ''}
-                      </p>
+                    <div className="mt-4 pt-4 border-t text-center" style={{ borderColor: themeColors.border }}>
+                      <style>{`.steam-desc h2,.steam-desc h3{font-size:inherit;font-weight:600;margin:0 0 0.5rem}.steam-desc ul{list-style:disc;padding-left:1.25rem;margin:0.5rem 0;display:inline-block;text-align:left}.steam-desc ol{list-style:decimal;padding-left:1.25rem;margin:0.5rem 0;display:inline-block;text-align:left}.steam-desc li{margin:0.25rem 0}.steam-desc br{content:'';display:block;margin:0.25rem 0}.steam-desc img{max-width:100%;border-radius:0.5rem;margin:0.75rem auto;display:block;backface-visibility:visible!important;transform:none!important}.steam-desc a{color:var(--color-primary-500,#6366f1);text-decoration:underline}.steam-desc strong{font-weight:600}.steam-desc{font-size:0.875rem;line-height:1.625;color:inherit;backface-visibility:visible!important}`}</style>
+                      <SteamDescription html={steamMetadata.aboutTheGame} />
                     </div>
                   )}
                 </div>
@@ -527,52 +534,89 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
         </div>
       </div>
 
-      {isExpanded && currentScreenshot && (
+      {isExpanded && screenshots.length > 0 && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
+          className={`fixed inset-0 z-50 flex items-center justify-center ${isClosing ? 'animate-modal-overlay-close' : 'animate-modal-overlay'}`}
           style={{ backgroundColor: 'rgba(0,0,0,0.92)' }}
-          onClick={() => setIsExpanded(false)}
+          onClick={() => animateClose()}
         >
-          <button
-            onClick={() => setIsExpanded(false)}
-            className="absolute top-4 right-4 p-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all z-10"
-          >
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-
-          {currentIndex > 0 && (
-            <button
-              onClick={(e) => { e.stopPropagation(); setCurrentIndex(i => i - 1) }}
-              className="absolute left-4 p-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all z-10"
-            >
-              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-          )}
-
-          <img
-            src={currentScreenshot}
-            alt=""
-            className="max-w-[90vw] max-h-[90vh] object-contain select-none"
+          <div
+            className={`relative w-full max-w-[90vw] max-h-[90vh] flex items-center justify-center ${isClosing ? 'animate-modal-close' : 'animate-modal-content'}`}
             onClick={(e) => e.stopPropagation()}
-            draggable={false}
-          />
-
-          {currentIndex < screenshots.length - 1 && (
+          >
             <button
-              onClick={(e) => { e.stopPropagation(); setCurrentIndex(i => i + 1) }}
-              className="absolute right-4 p-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all z-10"
+              onClick={() => animateClose()}
+              className="absolute -top-12 right-0 p-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all z-10"
             >
-              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-          )}
+
+            {clampedIndex > 0 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); setCurrentIndex(i => i - 1) }}
+                className="absolute left-0 p-2 -ml-14 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all z-10"
+              >
+                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
+
+            <div className="overflow-hidden w-full" style={{ maxHeight: '90vh' }}>
+              <div
+                className="flex animate-slide-track"
+                style={{ transform: `translateX(-${clampedIndex * 100}%)` }}
+              >
+                {screenshots.map((url, i) => (
+                  <div key={i} className="min-w-full flex items-center justify-center" style={{ maxHeight: '90vh' }}>
+                    <img
+                      src={url}
+                      alt=""
+                      className="max-w-full max-h-[90vh] object-contain select-none"
+                      draggable={false}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {clampedIndex < screenshots.length - 1 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); setCurrentIndex(i => i + 1) }}
+                className="absolute right-0 p-2 -mr-14 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all z-10"
+              >
+                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
   )
+}
+
+function SteamDescription({ html }: { html: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  const processed = html.replace(
+    /<img\s/gi,
+    '<img loading="eager" '
+  )
+
+  useEffect(() => {
+    if (!ref.current) return
+    const imgs = ref.current.querySelectorAll<HTMLImageElement>('img[src*=".gif"]')
+    imgs.forEach((img) => {
+      const src = img.getAttribute('src') || ''
+      if (!src || !src.startsWith('http')) return
+      const sep = src.includes('?') ? '&' : '?'
+      img.setAttribute('src', `${src}${sep}t=${Date.now()}`)
+    })
+  }, [html])
+
+  return <div ref={ref} className="steam-desc" dangerouslySetInnerHTML={{ __html: processed }} />
 }
