@@ -5,6 +5,7 @@ export interface GameInfo {
   name: string
   executablePath: string
   coverImage?: string
+  bannerImage?: string
   store: StoreType
   installLocation?: string
   lastPlayed?: string
@@ -27,7 +28,23 @@ export interface Settings {
   }
 }
 
-export type ViewType = 'all' | 'favorites' | 'recent' | 'steam' | 'epic' | 'ea' | 'custom' | 'settings'
+export type ViewType = 'all' | 'favorites' | 'recent' | 'steam' | 'epic' | 'ea' | 'custom' | 'settings' | 'game-detail'
+
+export interface SteamGameMetadata {
+  appId: string
+  name: string
+  developers: string[]
+  publishers: string[]
+  releaseDate: string | null
+  detailedDescription: string
+  aboutTheGame: string
+  shortDescription: string
+  genres: string[]
+  screenshots: string[]
+  minimumRequirements: string
+  recommendedRequirements: string
+  headerImage: string | null
+}
 
 export interface UpdateStatus {
   status: 'checking' | 'available' | 'not-available' | 'downloading' | 'downloaded' | 'error' | 'dev-mode'

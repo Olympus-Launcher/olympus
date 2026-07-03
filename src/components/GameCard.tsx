@@ -15,6 +15,7 @@ interface GameCardProps {
   onEdit: (game: GameInfo) => void
   themeColors: ThemeColors
   showStoreOnGameCard: boolean
+  onViewGame?: (game: GameInfo) => void
 }
 
 const storeLogos: Record<string, ReactElement> = {
@@ -31,13 +32,17 @@ const storeDisplayNames: Record<string, string> = {
   custom: 'Custom',
 }
 
-export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, onUnhide, onToggleFavorite, onEdit, themeColors, showStoreOnGameCard }: GameCardProps) {
+export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, onUnhide, onToggleFavorite, onEdit, themeColors, showStoreOnGameCard, onViewGame }: GameCardProps) {
   const { t } = useTranslation()
   const [showMenu, setShowMenu] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
   const handleLaunch = () => {
     onLaunch(game)
+  }
+
+  const handleViewGame = () => {
+    onViewGame?.(game)
   }
 
   const formatLastPlayed = (dateStr?: string) => {
@@ -57,18 +62,19 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
   if (viewMode === 'list') {
     return (
       <div 
-        className="game-card relative flex items-center gap-4 p-4 rounded-xl border hover:border-primary-500/30 select-none"
+        className="game-card relative flex items-center gap-4 p-4 rounded-xl border hover:border-primary-500/30 select-none cursor-pointer"
         style={{ 
           backgroundColor: themeColors.card, 
           borderColor: themeColors.border,
           zIndex: showMenu ? 40 : undefined
         }}
+        onClick={handleViewGame}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => { setIsHovered(false); setShowMenu(false) }}
       >
         <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 placeholder-icon" style={{ backgroundColor: themeColors.surface }}>
           {game.coverImage ? (
-            <img src={`file://${game.coverImage}?t=${Date.now()}`} alt={game.name} className="w-full h-full object-cover" key={`${game.id}-${game.coverImage}`} />
+            <img src={`file://${game.coverImage}?t=${Date.now()}`} alt={game.name} className="w-full h-full object-cover" key={`${game.id}-${game.coverImage}`} draggable={false} />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-2xl font-bold" style={{ color: themeColors.textSecondary }}>
               {(game.name || '?').charAt(0).toUpperCase()}
@@ -105,7 +111,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
           {isHovered && (
             <div className="relative">
               <button
-                onClick={() => setShowMenu(!showMenu)}
+                onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu) }}
                 className="p-2 hover:text-white"
                 style={{ color: themeColors.textSecondary }}
               >
@@ -117,7 +123,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
               {showMenu && (
                 <div className="absolute right-0 top-full mt-1 min-w-[140px] rounded-lg shadow-xl z-50 overflow-hidden" style={{ backgroundColor: themeColors.surface, borderColor: themeColors.border, borderWidth: 1, borderStyle: 'solid' }}>
                   <button
-                    onClick={() => { onEdit(game); setShowMenu(false) }}
+                    onClick={(e) => { e.stopPropagation(); onEdit(game); setShowMenu(false) }}
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10"
                     style={{ color: themeColors.text }}
                   >
@@ -127,7 +133,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
                     {t('gameCard.context_menu_edit')}
                   </button>
                   <button
-                    onClick={() => { game.isHidden ? onUnhide(game.id) : onHide(game.id); setShowMenu(false) }}
+                    onClick={(e) => { e.stopPropagation(); game.isHidden ? onUnhide(game.id) : onHide(game.id); setShowMenu(false) }}
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10"
                     style={{ color: themeColors.text }}
                   >
@@ -138,7 +144,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
                     {game.isHidden ? t('gameCard.unhide') : t('gameCard.context_menu_hide')}
                   </button>
                   <button
-                    onClick={() => { onRemove(game.id); setShowMenu(false) }}
+                    onClick={(e) => { e.stopPropagation(); onRemove(game.id); setShowMenu(false) }}
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left text-red-400 hover:bg-white/10"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,16 +162,17 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
   }
 
   return (
-    <div 
-      className="game-card group relative rounded-xl overflow-hidden border select-none"
-      style={{ 
-        backgroundColor: themeColors.card, 
-        borderColor: themeColors.border,
-        zIndex: showMenu ? 40 : undefined
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => { setIsHovered(false); setShowMenu(false) }}
-    >
+      <div 
+        className="game-card group relative rounded-xl overflow-hidden border select-none cursor-pointer"
+        style={{ 
+          backgroundColor: themeColors.card, 
+          borderColor: themeColors.border,
+          zIndex: showMenu ? 40 : undefined
+        }}
+        onClick={handleViewGame}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => { setIsHovered(false); setShowMenu(false) }}
+      >
       <div className="aspect-[2/3] relative">
         {game.coverImage ? (
           <img 
@@ -173,6 +180,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
             alt={game.name} 
             className="w-full h-full object-cover"
             key={`${game.id}-${game.coverImage}`}
+            draggable={false}
           />
         ) : (
           <div className="w-full h-full placeholder-icon flex items-center justify-center" style={{ backgroundColor: themeColors.surface }}>
@@ -186,7 +194,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <button
-              onClick={handleLaunch}
+              onClick={(e) => { e.stopPropagation(); handleLaunch() }}
               className="w-full flex items-center justify-center gap-2 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
             >
               <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
@@ -212,7 +220,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
 
         <div className="absolute top-2 right-2 flex gap-1">
           <button
-            onClick={() => onToggleFavorite(game.id)}
+            onClick={(e) => { e.stopPropagation(); onToggleFavorite(game.id) }}
             className="p-2 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
           >
             <svg 
@@ -226,7 +234,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
           </button>
 
           <button
-            onClick={() => setShowMenu(!showMenu)}
+            onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu) }}
             className="p-2 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
           >
             <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -237,7 +245,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
               {showMenu && (
                 <div className="absolute right-0 top-full mt-1 min-w-[140px] rounded-lg shadow-xl z-50 overflow-hidden" style={{ backgroundColor: themeColors.surface, borderColor: themeColors.border, borderWidth: 1, borderStyle: 'solid' }}>
                   <button
-                    onClick={() => { onEdit(game); setShowMenu(false) }}
+                    onClick={(e) => { e.stopPropagation(); onEdit(game); setShowMenu(false) }}
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10"
                     style={{ color: themeColors.text }}
                   >
@@ -247,7 +255,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
                     {t('gameCard.context_menu_edit')}
                   </button>
                   <button
-                    onClick={() => { game.isHidden ? onUnhide(game.id) : onHide(game.id); setShowMenu(false) }}
+                    onClick={(e) => { e.stopPropagation(); game.isHidden ? onUnhide(game.id) : onHide(game.id); setShowMenu(false) }}
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10"
                     style={{ color: themeColors.text }}
                   >
@@ -258,7 +266,7 @@ export default function GameCard({ game, viewMode, onLaunch, onRemove, onHide, o
                     {game.isHidden ? t('gameCard.unhide') : t('gameCard.context_menu_hide')}
                   </button>
                   <button
-                    onClick={() => { onRemove(game.id); setShowMenu(false) }}
+                    onClick={(e) => { e.stopPropagation(); onRemove(game.id); setShowMenu(false) }}
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left text-red-400 hover:bg-white/10"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -91,10 +91,12 @@
     "gameName": "Game Name",
     "executablePath": "Executable Path",
     "coverImage": "Cover Image",
+    "bannerImage": "Banner Image",
     "onlyCoverEditable": "Only cover image can be changed for {{store}} games.",
     "browse": "Browse",
     "steamGridDB": "SteamGridDB",
-    "steamGridDBTooltip": "Download from SteamGridDB"
+    "steamGridDBTooltip": "Download from SteamGridDB",
+    "steamGridDBBannerTooltip": "Download banner from SteamGridDB"
   },
 
   "settings": {
@@ -172,15 +174,19 @@
 
   "steamGridDB": {
     "title": "Download Cover from SteamGridDB",
+    "heroTitle": "Download Banner from SteamGridDB",
     "searching": "Searching...",
     "foundMultiple": "Found multiple games. Select the correct one:",
     "chooseDifferent": "Choose different game",
     "selectCover": "Select a cover:",
     "noCovers": "No covers available for this game.",
+    "noHeroes": "No banners available for this game.",
     "failedToLoadCovers": "Failed to load covers for this game.",
+    "failedToLoadHeroes": "Failed to load banners for this game.",
     "gameNotFound": "The game you searched for was not found.",
     "failedToSearchGames": "Failed to search for games.",
     "failedToDownloadCover": "Failed to download cover image.",
+    "failedToDownloadHero": "Failed to download banner image.",
     "tryAgain": "Try Again",
     "downloading": "Downloading...",
     "download": "Download",
@@ -227,6 +233,17 @@
     "verified": "Verified",
     "skip": "Skip",
     "noApiKey": "No SteamGridDB API key configured. Please add one in Settings to enable automatic cover downloads."
+  },
+
+  "gameDetail": {
+    "back": "Back",
+    "playGame": "Play Game",
+    "editGame": "Edit",
+    "gameInfo": "Game Info",
+    "lastPlayed": "Last Played",
+    "playCount": "Times Played",
+    "store": "Store",
+    "screenshots": "Screenshots"
   }
 
 }

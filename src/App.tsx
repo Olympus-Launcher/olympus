@@ -10,6 +10,7 @@ import EditGameModal from './components/EditGameModal'
 import ChangelogModal from './components/ChangelogModal'
 import WebView from './components/WebView'
 import AutoCoverModal, { GameSelectionModal } from './components/AutoCoverModal'
+import GameDetailView from './components/GameDetailView'
 import { TooltipProvider } from './components/Tooltip'
 import { GameInfo, ViewType, Settings } from './types'
 import { themes } from './config'
@@ -50,6 +51,9 @@ function App() {
   const [showAutoCoverModal, setShowAutoCoverModal] = useState(false)
   const [needsSelection, setNeedsSelection] = useState<{ gameId: string; gameName: string; matches: { id: number; name: string; verified: boolean }[] } | null>(null)
   const [coverDownloadStatus, setCoverDownloadStatus] = useState<{ isDownloading: boolean; gameName: string } | null>(null)
+
+  const [selectedGame, setSelectedGame] = useState<GameInfo | null>(null)
+  const [previousView, setPreviousView] = useState<ViewType>('all')
   const { t } = useTranslation()
   const themeColors = themes[settings.theme]
 
@@ -138,7 +142,7 @@ function App() {
 
       if (settingsWithDefaults.scanOnStartup) {
         await scanForGames(false)
-        
+
         if (settingsWithDefaults.autoDownloadCovers) {
           setTimeout(async () => {
             const coverResult = await window.electronAPI.autoDownloadCovers()
@@ -270,13 +274,35 @@ function App() {
         }
       }
       
-      const finalGame = { ...updatedGame, coverImage }
+      let bannerImage = updatedGame.bannerImage
+      if (bannerImage && !bannerImage.includes('covers') && !bannerImage.startsWith('file://')) {
+        try {
+          const savedPath = await window.electronAPI.saveGameBanner(updatedGame.id, bannerImage)
+          bannerImage = savedPath
+        } catch (error) {
+          console.error('Error copying banner:', error)
+        }
+      }
+      
+      const finalGame = { ...updatedGame, coverImage, bannerImage }
       await window.electronAPI.saveGames(games.map(g => g.id === updatedGame.id ? finalGame : g))
       setGames(prev => prev.map(g => g.id === updatedGame.id ? finalGame : g))
+      setSelectedGame(prev => prev?.id === updatedGame.id ? finalGame : prev)
       setEditingGame(null)
     } catch (error) {
       console.error('Error editing game:', error)
     }
+  }
+
+  const handleGameSelect = (game: GameInfo) => {
+    setPreviousView(currentView)
+    setSelectedGame(game)
+    setCurrentView('game-detail')
+  }
+
+  const handleBackFromGameDetail = () => {
+    setSelectedGame(null)
+    setCurrentView(previousView)
   }
 
   const handleLaunchStore = async (storeName: string) => {
@@ -318,6 +344,9 @@ function App() {
         isFavorite: favoriteSet.has(g.id)
       }))
       setGames(updatedGames)
+      if (selectedGame && selectedGame.id === gameId) {
+        setSelectedGame({ ...selectedGame, isFavorite: favoriteSet.has(gameId) })
+      }
     } catch (error) {
       console.error('Error toggling favorite:', error)
     }
@@ -389,6 +418,9 @@ function App() {
   const handleViewChange = (view: ViewType) => {
     setCurrentView(view)
     setSearchQuery('')
+    if (view !== 'game-detail') {
+      setSelectedGame(null)
+    }
   }
 
   const appStyle = {
@@ -398,6 +430,9 @@ function App() {
     '--color-border': themeColors.border,
     '--color-text': themeColors.text,
     '--color-text-secondary': themeColors.textSecondary,
+    '--color-scrollbar-track': settings.theme === 'dark' ? '#1a1a1a' : '#f5f5f5',
+    '--color-scrollbar-thumb': settings.theme === 'dark' ? '#333333' : '#d1d5db',
+    '--color-scrollbar-thumb-hover': settings.theme === 'dark' ? '#444444' : '#9ca3af',
   } as React.CSSProperties
 
   return (
@@ -516,6 +551,16 @@ function App() {
                 const games = await window.electronAPI.getGames()
                 setGames(games)
               }}
+
+            />
+          ) : currentView === 'game-detail' && selectedGame ? (
+            <GameDetailView
+              game={selectedGame}
+              themeColors={themeColors}
+              onBack={handleBackFromGameDetail}
+              onLaunch={handleLaunchGame}
+              onEdit={setEditingGame}
+              onToggleFavorite={handleToggleFavorite}
             />
           ) : (
             <>
@@ -583,6 +628,7 @@ function App() {
                 onUnhide={handleUnhideGame}
                 onToggleFavorite={handleToggleFavorite}
                 onEdit={setEditingGame}
+                onViewGame={handleGameSelect}
                 isEmpty={filteredGames.length === 0}
                 isScanning={isScanning}
                 onScan={handleManualScan}

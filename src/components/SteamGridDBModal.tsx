@@ -25,6 +25,7 @@ interface SteamGridDBModalProps {
   theme: ThemeMode
   onClose: () => void
   onCoverSelected: (coverPath: string) => void
+  imageType?: 'cover' | 'hero'
 }
 
 type ModalStep = 'loading' | 'games' | 'covers' | 'error'
@@ -34,7 +35,8 @@ export default function SteamGridDBModal({
   gameId,
   steamAppId,
   onClose,
-  onCoverSelected
+  onCoverSelected,
+  imageType = 'cover'
 }: SteamGridDBModalProps) {
   const { t } = useTranslation()
   const [step, setStep] = useState<ModalStep>('loading')
@@ -43,6 +45,8 @@ export default function SteamGridDBModal({
   const [grids, setGrids] = useState<SteamGridDBGrid[]>([])
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+
+  const isHero = imageType === 'hero'
 
   const performSearch = useCallback(async (query: string) => {
     setIsLoading(true)
@@ -90,8 +94,9 @@ export default function SteamGridDBModal({
     setSelectedGame(game)
 
     try {
-      const result = await window.electronAPI.getSteamGridDBGrids(game.id)
-      console.log('Frontend received grids:', result.grids)
+      const result = isHero
+        ? await window.electronAPI.getSteamGridDBHeroes(game.id)
+        : await window.electronAPI.getSteamGridDBGrids(game.id)
       
       if (result.error) {
         setError(result.error)
@@ -100,7 +105,7 @@ export default function SteamGridDBModal({
       }
 
       if (result.grids.length === 0) {
-        setError(t('steamGridDB.noCovers'))
+        setError(isHero ? t('steamGridDB.noHeroes') : t('steamGridDB.noCovers'))
         setStep('error')
         return
       }
@@ -108,7 +113,7 @@ export default function SteamGridDBModal({
       setGrids(result.grids)
       setStep('covers')
     } catch (err) {
-      setError(t('steamGridDB.failedToLoadCovers'))
+      setError(isHero ? t('steamGridDB.failedToLoadHeroes') : t('steamGridDB.failedToLoadCovers'))
       setStep('error')
     } finally {
       setIsLoading(false)
@@ -120,7 +125,9 @@ export default function SteamGridDBModal({
     setError(null)
 
     try {
-      const result = await window.electronAPI.getSteamGridDBGridsByAppId(appId)
+      const result = isHero
+        ? await window.electronAPI.getSteamGridDBHeroesByAppId(appId)
+        : await window.electronAPI.getSteamGridDBGridsByAppId(appId)
       
       if (result.error) {
         if (result.error.includes('rate limit') || result.error.includes('Too Many Requests')) {
@@ -163,7 +170,9 @@ export default function SteamGridDBModal({
     setError(null)
 
     try {
-      const result = await window.electronAPI.downloadSteamGridDBCover(grid.url, gameId)
+      const result = isHero
+        ? await window.electronAPI.downloadSteamGridDBHero(grid.url, gameId)
+        : await window.electronAPI.downloadSteamGridDBCover(grid.url, gameId)
       if (result.error) {
         setError(result.error)
       } else {
@@ -171,7 +180,7 @@ export default function SteamGridDBModal({
         onClose()
       }
     } catch (err) {
-      setError(t('steamGridDB.failedToDownloadCover'))
+      setError(isHero ? t('steamGridDB.failedToDownloadHero') : t('steamGridDB.failedToDownloadCover'))
     } finally {
       setIsLoading(false)
     }
@@ -188,7 +197,7 @@ export default function SteamGridDBModal({
       <div className="bg-theme-surface border border-theme-border rounded-2xl w-full max-w-3xl mx-4 overflow-hidden fade-in max-h-[80vh]">
         <div className="flex items-center justify-between px-6 py-4 border-b border-theme-border">
           <h2 className="text-lg font-semibold text-theme-text">
-            {t('steamGridDB.title')}
+            {isHero ? t('steamGridDB.heroTitle') : t('steamGridDB.title')}
           </h2>
           <button
             onClick={onClose}
@@ -259,10 +268,10 @@ export default function SteamGridDBModal({
                 )}
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className={`grid ${isHero ? 'grid-cols-2' : 'grid-cols-3'} gap-4`}>
                 {grids.map((grid) => {
                   const [width, height] = grid.dimensions.split('x').map(Number)
-                  const aspectRatio = width && height ? width / height : 3/4
+                  const aspectRatio = width && height ? width / height : (isHero ? 3/1 : 3/4)
                   
                   return (
                     <button

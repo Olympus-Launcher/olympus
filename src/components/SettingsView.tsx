@@ -12,7 +12,7 @@ interface SettingsViewProps {
   onSave: (settings: Settings) => void
   onScanGames: () => void
   isScanning: boolean
-  onRefreshGames?: () => void
+  onRefreshGames: () => void
 }
 
 export default function SettingsView({ settings, onSave, onScanGames, isScanning, onRefreshGames }: SettingsViewProps) {
@@ -209,6 +209,7 @@ export default function SettingsView({ settings, onSave, onScanGames, isScanning
                     )}
                   </button>
                 </div>
+
               </div>
             </div>
 

@@ -146,3 +146,4 @@ dist-electron/
 AGENTS.md
 .opencode/*
 build/
+resources/

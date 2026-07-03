@@ -3,6 +3,7 @@ export interface GameInfo {
   name: string
   executablePath: string
   coverImage?: string
+  bannerImage?: string
   store: 'steam' | 'epic' | 'ea' | 'custom'
   installLocation?: string
   lastPlayed?: string
@@ -30,6 +31,22 @@ export interface SteamGridDBGame {
   name: string
   types: string[]
   verified: boolean
+}
+
+export interface SteamGameMetadata {
+  appId: string
+  name: string
+  developers: string[]
+  publishers: string[]
+  releaseDate: string | null
+  detailedDescription: string
+  aboutTheGame: string
+  shortDescription: string
+  genres: string[]
+  screenshots: string[]
+  minimumRequirements: string
+  recommendedRequirements: string
+  headerImage: string | null
 }
 
 export interface SteamGridDBGrid {
