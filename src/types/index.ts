@@ -6,6 +6,9 @@ export interface GameInfo {
   executablePath: string
   coverImage?: string
   bannerImage?: string
+  bannerFocalX?: number
+  bannerFocalY?: number
+  bannerZoom?: number
   store: StoreType
   installLocation?: string
   lastPlayed?: string

@@ -88,6 +88,8 @@
 
   "editGame": {
     "title": "Edit Game",
+    "tabGame": "Game",
+    "tabArtwork": "Artwork",
     "gameName": "Game Name",
     "executablePath": "Executable Path",
     "coverImage": "Cover Image",
@@ -96,7 +98,8 @@
     "browse": "Browse",
     "steamGridDB": "SteamGridDB",
     "steamGridDBTooltip": "Download from SteamGridDB",
-    "steamGridDBBannerTooltip": "Download banner from SteamGridDB"
+    "steamGridDBBannerTooltip": "Download banner from SteamGridDB",
+    "dragToReposition": "Drag to reposition banner"
   },
 
   "settings": {

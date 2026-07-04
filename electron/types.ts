@@ -4,6 +4,9 @@ export interface GameInfo {
   executablePath: string
   coverImage?: string
   bannerImage?: string
+  bannerFocalX?: number
+  bannerFocalY?: number
+  bannerZoom?: number
   store: 'steam' | 'epic' | 'ea' | 'custom'
   installLocation?: string
   lastPlayed?: string

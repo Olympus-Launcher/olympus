@@ -87,6 +87,8 @@
 
   "editGame": {
     "title": "Editar Jogo",
+    "tabGame": "Jogo",
+    "tabArtwork": "Arte",
     "gameName": "Nome do Jogo",
     "executablePath": "Caminho do Executável (.exe)",
     "coverImage": "Imagem de Capa",
@@ -95,7 +97,8 @@
     "browse": "Procurar",
     "steamGridDB": "SteamGridDB",
     "steamGridDBTooltip": "Fazer download de através do SteamGridDB",
-    "steamGridDBBannerTooltip": "Fazer download de banner através do SteamGridDB"
+    "steamGridDBBannerTooltip": "Fazer download de banner através do SteamGridDB",
+    "dragToReposition": "Arraste para reposicionar o banner"
   },
 
   "settings": {

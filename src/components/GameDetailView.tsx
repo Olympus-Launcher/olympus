@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, cloneElement, ReactElement } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo, cloneElement, ReactElement } from 'react'
 import { useTranslation } from 'react-i18next'
 import { GameInfo, SteamGameMetadata } from '../types'
 import { ThemeColors } from '../config'
@@ -33,6 +33,35 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
   const [showStickyBar, setShowStickyBar] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
+  const bannerRef = useRef<HTMLDivElement>(null)
+  const [bannerNaturalSize, setBannerNaturalSize] = useState<{ w: number; h: number } | null>(null)
+  const [bannerContainerSize, setBannerContainerSize] = useState({ w: 0, h: 0 })
+
+  const bannerStyle = useMemo((): React.CSSProperties => {
+    if (!bannerContainerSize.w || !bannerContainerSize.h || !bannerNaturalSize) {
+      return { width: '100%', height: '100%', objectFit: 'cover', opacity: 0 }
+    }
+    return {
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover',
+      transform: `scale(${game.bannerZoom ?? 1})`,
+      transformOrigin: `${game.bannerFocalX ?? 50}% ${game.bannerFocalY ?? 50}%`,
+      opacity: 1,
+    }
+  }, [bannerContainerSize, bannerNaturalSize, game.bannerFocalX, game.bannerFocalY, game.bannerZoom])
+
+  useEffect(() => {
+    const update = () => {
+      const el = bannerRef.current
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      setBannerContainerSize({ w: rect.width, h: rect.height })
+    }
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [game.bannerImage])
 
   const screenshots = steamMetadata?.screenshots ?? []
   const clampedIndex = screenshots.length === 0 ? 0 : Math.min(currentIndex, screenshots.length - 1)
@@ -155,19 +184,21 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
       </div>
 
       {hasBanner && (
-        <div className="w-full" style={{ height: '20rem' }}>
-          <div className="relative h-full">
-            <img
-              src={`file://${game.bannerImage}?t=${Date.now()}`}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-              draggable={false}
-              onError={() => setBannerError(true)}
-            />
-            <div className="absolute inset-0" style={{
-              background: `linear-gradient(to top, ${themeColors.bg} 0%, transparent 60%)`
-            }} />
-          </div>
+        <div ref={bannerRef} className="w-full" style={{ height: '20rem', overflow: 'hidden', position: 'relative' }}>
+          <img
+            src={`file://${game.bannerImage}?t=${Date.now()}`}
+            alt=""
+            draggable={false}
+            onError={() => setBannerError(true)}
+            onLoad={(e) => {
+              const img = e.currentTarget
+              setBannerNaturalSize({ w: img.naturalWidth, h: img.naturalHeight })
+            }}
+            style={bannerStyle}
+          />
+          <div className="absolute inset-0" style={{
+            background: `linear-gradient(to top, ${themeColors.bg} 0%, transparent 60%)`
+          }} />
         </div>
       )}
 
