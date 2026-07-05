@@ -447,10 +447,10 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
                   </div>
 
 
-                  {steamMetadata?.aboutTheGame && (
+                  {steamMetadata?.detailedDescription && (
                     <div className="mt-4 pt-4 border-t text-center" style={{ borderColor: themeColors.border }}>
-                      <style>{`.steam-desc h2,.steam-desc h3{font-size:inherit;font-weight:600;margin:0 0 0.5rem}.steam-desc ul{list-style:disc;padding-left:1.25rem;margin:0.5rem 0;display:inline-block;text-align:left}.steam-desc ol{list-style:decimal;padding-left:1.25rem;margin:0.5rem 0;display:inline-block;text-align:left}.steam-desc li{margin:0.25rem 0}.steam-desc br{content:'';display:block;margin:0.25rem 0}.steam-desc img{max-width:100%;border-radius:0.5rem;margin:0.75rem auto;display:block;backface-visibility:visible!important;transform:none!important}.steam-desc a{color:var(--color-primary-500,#6366f1);text-decoration:underline}.steam-desc strong{font-weight:600}.steam-desc{font-size:0.875rem;line-height:1.625;color:inherit;backface-visibility:visible!important}`}</style>
-                      <SteamDescription html={steamMetadata.aboutTheGame} />
+                      <style>{`.steam-desc h2,.steam-desc h3{font-size:inherit;font-weight:600;margin:0 0 0.5rem}.steam-desc ul{list-style:disc;padding-left:1.25rem;margin:0.5rem 0;display:inline-block;text-align:left}.steam-desc ol{list-style:decimal;padding-left:1.25rem;margin:0.5rem 0;display:inline-block;text-align:left}.steam-desc li{margin:0.25rem 0}.steam-desc br{content:'';display:block;margin:0.25rem 0}.steam-desc img,.steam-desc video{max-width:100%;border-radius:0.5rem;margin:0.75rem auto;display:block;backface-visibility:visible!important;transform:none!important}.steam-desc a{color:var(--color-primary-500,#6366f1);text-decoration:underline}.steam-desc strong{font-weight:600}.steam-desc{font-size:0.875rem;line-height:1.625;color:inherit;backface-visibility:visible!important}`}</style>
+                       <SteamDescription html={steamMetadata.detailedDescription} />
                     </div>
                   )}
                 </div>
@@ -633,21 +633,26 @@ export default function GameDetailView({ game, themeColors, onBack, onLaunch, on
 function SteamDescription({ html }: { html: string }) {
   const ref = useRef<HTMLDivElement>(null)
 
-  const processed = html.replace(
-    /<img\s/gi,
-    '<img loading="eager" '
-  )
-
   useEffect(() => {
     if (!ref.current) return
-    const imgs = ref.current.querySelectorAll<HTMLImageElement>('img[src*=".gif"]')
-    imgs.forEach((img) => {
-      const src = img.getAttribute('src') || ''
-      if (!src || !src.startsWith('http')) return
-      const sep = src.includes('?') ? '&' : '?'
-      img.setAttribute('src', `${src}${sep}t=${Date.now()}`)
+    ref.current.querySelectorAll('video').forEach(v => {
+      v.muted = true
+      if (!v.src) {
+        const source = v.querySelector('source[src]')
+        if (source) {
+          v.src = source.getAttribute('src') || ''
+        }
+      }
+      if (v.src) {
+        v.load()
+        v.play().catch(() => {
+          const tryPlay = () => v.play().catch(() => {})
+          v.addEventListener('canplay', tryPlay, { once: true })
+          setTimeout(tryPlay, 2000)
+        })
+      }
     })
   }, [html])
 
-  return <div ref={ref} className="steam-desc" dangerouslySetInnerHTML={{ __html: processed }} />
+  return <div ref={ref} className="steam-desc" dangerouslySetInnerHTML={{ __html: html }} />
 }

@@ -13,6 +13,13 @@ function stripHtml(input: string): string {
   return input.replace(/<[^>]*>/g, '')
 }
 
+function cleanPosterUrls(html: string): string {
+  return html.replace(
+    /(https?:\/\/[^\s"']+)\.poster\.\w+(\?[^\s"']*)?/gi,
+    (_match, basePath) => basePath
+  )
+}
+
 function parseRequirements(text: string): Record<string, string> {
   const result: Record<string, string> = {}
   const lines = text.split('\n')
@@ -83,8 +90,8 @@ export async function getSteamGameMetadata(
       developers: d.developers || [],
       publishers: d.publishers || [],
       releaseDate: d.release_date?.date || null,
-      detailedDescription: d.detailed_description || '',
-      aboutTheGame: d.about_the_game || '',
+      detailedDescription: cleanPosterUrls(d.detailed_description || ''),
+      aboutTheGame: cleanPosterUrls(d.about_the_game || ''),
       shortDescription: stripHtml(d.short_description || ''),
       genres: (d.genres || []).map((g: { description: string }) => g.description),
       screenshots: (d.screenshots || []).map((s: { path_full: string }) => s.path_full),
